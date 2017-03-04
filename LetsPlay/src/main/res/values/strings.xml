@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Let\'s Play!</string>
+    <string name="emailEntryText">E-mail:</string>
+    <string name="usernameEntryText">Username:</string>
+    <string name="passwordEntryText">Password:</string>
+    <string name="passwordConfirmationText">Confirm Password:</string>
+    <string name="confirmButton">Confirm</string>
+</resources>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="1"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="play.wtsc.com.intro.MainActivity">
+
+    <TableRow>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp"
+            android:layout_span="2"
+            android:textSize="16dp"
+            android:lineSpacingMultiplier="1.2"
+            android:text="Let's get you started! First we just need a bit of info to get you registered..." />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            android:gravity="end"
+            android:text="@string/emailEntryText" />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:imeOptions="actionNext"
+            android:id="@+id/emailSubmission"
+            />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            android:gravity="end"
+            android:text="@string/usernameEntryText" />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:imeOptions="actionNext"
+            android:id="@+id/usernameSubmission"
+            />
+    </TableRow>
+
+
+            <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textAlignment="textEnd"
+                android:gravity="end"
+                android:text="@string/passwordEntryText" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:imeOptions="actionNext"
+                android:id="@+id/passwordSubmission"
+                />
+            </TableRow>
+
+
+    <TableRow>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            android:gravity="end"
+            android:text="@string/passwordConfirmationText" />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:imeOptions="actionNext"
+            android:id="@+id/passwordConfirmation"
+            />
+    </TableRow>
+    <TableRow
+        android:paddingTop="20dp" >
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/confirmButton"
+            android:id="@+id/confirm"
+            android:layout_span="2" />
+    </TableRow>
+
+
+</TableLayout>
