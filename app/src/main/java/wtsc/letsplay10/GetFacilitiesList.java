@@ -2,6 +2,9 @@ package wtsc.letsplay10;
 
 import android.os.AsyncTask;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -12,7 +15,7 @@ import java.util.List;
  * Created by Ricky Stambach on 3/3/2017.
  */
 
-public class GetFacilitiesList extends AsyncTask<String,String,List<Facility>> {
+public class GetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Facility>> {
     private ConnectionClass connectionClass;
     private OnFacitiliesDataLoaded dataLoaded;
     private List<Facility> facilitiesList;
@@ -25,7 +28,7 @@ public class GetFacilitiesList extends AsyncTask<String,String,List<Facility>> {
     }
 
     @Override
-    protected List<Facility> doInBackground(String... params) {
+    protected List<Facility> doInBackground(LatLngBounds... params) {
 
         String z = "";
         Boolean isSuccess = false;
@@ -37,14 +40,19 @@ public class GetFacilitiesList extends AsyncTask<String,String,List<Facility>> {
                 z = "Error in connection with SQL server ";
             } else {
                 String query;
-           //     if(params.length > 0 )
-           //     {
-             //       query = "select * from [Facility] WHERE ID = '"+(String)params[0]+"'";
-            //    }
-            //    else
-            //    {
+                if(params.length > 0 )
+                {
+                    LatLng sw = params[0].southwest;
+                    LatLng ne = params[0].northeast;
+
+                    query = "select * from [Facility] WHERE "+
+                            "[Lat] > " + sw.latitude + " AND [Lat] < " + ne.latitude + " AND " +
+                            "[Lng] > " + sw.longitude + " AND [Lng] < " + ne.longitude;
+                }
+                else
+                {
                     query = "select * from [Facility]";
-             //   }
+                }
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
 

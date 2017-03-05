@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements
     private List<Sport> allSportsList;
     private List<Facility> facilitiesList;
     private GoogleMap mMap;
+    private GetFacilitiesList getFacils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
 
-        GetFacilitiesList getFacils = new GetFacilitiesList(MainActivity.this);
-        getFacils.execute();
+
+
     }
 
 
@@ -91,13 +92,15 @@ public class MainActivity extends AppCompatActivity implements
     public void onCameraIdle() {
         // returns current bounds
         LatLngBounds curBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-
+        getFacils = new GetFacilitiesList(MainActivity.this);
+        getFacils.execute(curBounds);
     }
 
     @Override
     public void onFacitiliesDataLoaded(List<Facility> facilities) {
         facilitiesList = facilities;
         if(facilities.size()>0){
+            mMap.clear();
             for(Facility f:facilities)
             {
                 LatLng markerPos = new LatLng(f.getLatitude(), f.getLongitude());
