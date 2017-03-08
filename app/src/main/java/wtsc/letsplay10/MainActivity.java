@@ -1,5 +1,7 @@
 package wtsc.letsplay10;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -30,13 +32,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
-import static wtsc.letsplay10.R.id.map;
-
-//import android.location.Location;
-
 public class MainActivity extends AppCompatActivity implements
         OnCameraIdleListener,
-        OnUserDataLoaded,
         OnSportsDataLoaded,
         OnScheduleDataLoaded,
         LocationListener,
@@ -46,12 +43,14 @@ GoogleApiClient.OnConnectionFailedListener,
         OnMapReadyCallback {
 
     // instance of the GetCurrentUser utility functions to get the user data from the database
-    static GetCurrentUser getUser;
+    static dbGetCurrentUser getUser;
     private User currentUser;       // stores the current user object
     private GetSportsList getSportsList;
     private List<Sport> allSportsList;
     private List<Facility> facilitiesList;
     private GoogleMap mMap;
+    private dbGetFacilitiesList getFacils;
+    private SharedPreferences preferences;
     private GetFacilitiesList getFacils;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -65,6 +64,20 @@ GoogleApiClient.OnConnectionFailedListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
+
+     //   SharedPreferences.Editor prefsEditor = preferences.edit(); // these line are for development
+    //    prefsEditor.clear();            // these line are for development
+     //   prefsEditor.apply();            // these line are for development
+
+        String json = preferences.getString("User", "");
+
+        if(json.equals(""))
+        {
+            startActivity(new Intent(getApplicationContext(),Introduction.class));
+        }
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
     }
@@ -91,6 +104,7 @@ GoogleApiClient.OnConnectionFailedListener,
         String gn = user.getGameName();
         getSportsList = new GetSportsList(MainActivity.this);
         getSportsList.execute();
+
     }
 
     @Override
@@ -135,7 +149,7 @@ GoogleApiClient.OnConnectionFailedListener,
     public void onCameraIdle() {
         // returns current bounds
         LatLngBounds curBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        getFacils = new GetFacilitiesList(MainActivity.this);
+        getFacils = new dbGetFacilitiesList(MainActivity.this);
         getFacils.execute(curBounds);
     }
 

@@ -14,17 +14,17 @@ import java.util.List;
  * Created by Ricky Stambach on 2/21/2017.
  */
 
-public class GetSchedules extends AsyncTask<String,String,List<Schedule>> {
+public class dbGetSchedules extends AsyncTask<String,String,List<Schedule>> {
 
-    private ConnectionClass connectionClass;
+    private dbConnectionClass connectionClass;
     private OnScheduleDataLoaded dataLoaded;
     private List<Schedule> schedulesList;
 
-    public GetSchedules(OnScheduleDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetSchedules(OnScheduleDataLoaded activityContext){this.dataLoaded = activityContext;}
 
     @Override
     protected void onPreExecute() {
-        connectionClass = new ConnectionClass();
+        connectionClass = new dbConnectionClass();
     }
 
     @Override

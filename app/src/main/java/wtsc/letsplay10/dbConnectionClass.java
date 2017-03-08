@@ -2,6 +2,7 @@ package wtsc.letsplay10;
 
 import android.os.StrictMode;
 import android.util.Log;
+
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -11,7 +12,7 @@ import java.sql.SQLException;
  * Created by Ricky Stambach on 2/15/2017.
  */
 
-public class ConnectionClass {
+public class dbConnectionClass {
     String ip = "wtsc.database.windows.net";        // connection variables
     String classs = "net.sourceforge.jtds.jdbc.Driver";
     String db = "LetsPlay";
