@@ -1,6 +1,7 @@
 package wtsc.letsplay10;
 
 import android.os.AsyncTask;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class GetSportsList extends AsyncTask<String,String,List<Sport>> {
 
-    private ConnectionClass connectionClass;
+    private dbConnectionClass connectionClass;
     private OnSportsDataLoaded dataLoaded;
     private List<Sport> sportsList;
 
@@ -22,7 +23,7 @@ public class GetSportsList extends AsyncTask<String,String,List<Sport>> {
 
     @Override
     protected void onPreExecute() {
-        connectionClass = new ConnectionClass();
+        connectionClass = new dbConnectionClass();
     }
 
     @Override

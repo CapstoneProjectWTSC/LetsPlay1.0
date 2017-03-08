@@ -15,16 +15,16 @@ import java.util.List;
  * Created by Ricky Stambach on 3/3/2017.
  */
 
-public class GetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Facility>> {
-    private ConnectionClass connectionClass;
+public class dbGetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Facility>> {
+    private dbConnectionClass connectionClass;
     private OnFacitiliesDataLoaded dataLoaded;
     private List<Facility> facilitiesList;
 
-    public GetFacilitiesList(OnFacitiliesDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetFacilitiesList(OnFacitiliesDataLoaded activityContext){this.dataLoaded = activityContext;}
 
     @Override
     protected void onPreExecute() {
-        connectionClass = new ConnectionClass();
+        connectionClass = new dbConnectionClass();
     }
 
     @Override

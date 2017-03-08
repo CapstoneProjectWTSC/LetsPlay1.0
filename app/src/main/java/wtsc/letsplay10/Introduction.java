@@ -1,24 +1,26 @@
 package wtsc.letsplay10;
 
-import android.content.Context;
 import android.content.Intent;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import org.apache.commons.validator.routines.EmailValidator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.content.SharedPreferences;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.gson.Gson;
 
-public class Introduction extends AppCompatActivity implements OnClickListener, OnKeyListener{
+public class Introduction extends AppCompatActivity
+        implements OnClickListener,
+                    OnKeyListener,
+                    OndbFindGameName,
+                    OndbFindEmail,
+                    OnNewUserAdded{
 
     private EditText emailSubmission;
     private EditText usernameSubmission;
@@ -31,8 +33,11 @@ public class Introduction extends AppCompatActivity implements OnClickListener, 
     private String passwordSubmissionString;
     private String passwordConfirmationString;
 
-    private User user = new User();
 
+    private dbFindGameName db_findGameName;
+    private dbFindEmail db_findEmail;
+    private dbAddNewUser db_addNewUser;
+    private User currentUser = new User();
     private SharedPreferences preferences;
 
     @Override
@@ -44,13 +49,6 @@ public class Introduction extends AppCompatActivity implements OnClickListener, 
 
         String json = preferences.getString("User", "");
 
-
-        if (!json.equals(""))
-        {
-            Gson gson = new Gson();
-            user = gson.fromJson(json, User.class);
-            startActivity(new Intent(getApplicationContext(), Account.class));
-        }
 
         emailSubmission = (EditText) findViewById(R.id.emailSubmission);
         usernameSubmission = (EditText) findViewById(R.id.usernameSubmission);
@@ -127,7 +125,10 @@ public class Introduction extends AppCompatActivity implements OnClickListener, 
                 // usernameSubmission.setError("That username is already in use.");
                 //break;
                 //}
+                db_findGameName = new dbFindGameName(Introduction.this);    //check if currentUser is in database
+                db_findGameName.execute(usernameSubmissionString);      // returns in onDBFindGameName
 
+                //--------------------------See onDBFindGameName -------------------------------------------
                 //if(email is in database){
                 // emailSubmission.setError("That e-mail is already in use.");
                 //break;
@@ -136,19 +137,56 @@ public class Introduction extends AppCompatActivity implements OnClickListener, 
                 //send username email, password combo to database
 
                 //setContentView(R.layout.'name of the map page');
-                user.setEmail(emailSubmissionString);
-                user.setGameName(usernameSubmissionString);
-                user.setPassword(passwordSubmissionString);
 
-                SharedPreferences.Editor prefsEditor = preferences.edit();
-                Gson gson = new Gson();
-                String json = gson.toJson(user);
-                prefsEditor.putString("User", json);
-                prefsEditor.commit();
 
-                startActivity(new Intent(getApplicationContext(), Account.class));
+
+             //   startActivity(new Intent(getApplicationContext(), Account.class));
 
                 break;
         }
+    }
+
+
+    @Override
+    public void onDBFindGameName(boolean isInDatabase) {
+        if(isInDatabase){
+            // Error GameName already in database.
+        }
+        else
+        {
+            db_findEmail = new dbFindEmail(Introduction.this);    //check if email is in database
+            db_findEmail.execute(emailSubmissionString);      // returns in onDBFindEmail
+        }
+    }
+
+    @Override
+    public void onDBFindEmail(boolean isInDatabase) {
+        if(isInDatabase){
+            // Error Email already in database
+        }
+        else
+        {
+            // Email and GameName are availble to use add new currentUser to database
+            currentUser.setEmail(emailSubmissionString);
+            currentUser.setGameName(usernameSubmissionString);
+            currentUser.setPassword(passwordSubmissionString);
+            currentUser.setFirstName("");
+            currentUser.setLastName("");
+
+            db_addNewUser = new dbAddNewUser(Introduction.this);
+            db_addNewUser.execute(currentUser.getFirstName(), currentUser.getLastName(),
+                    currentUser.getGameName(), currentUser.getPassword(), currentUser.getEmail());
+        }
+    }
+
+    @Override
+    public void onDBNewUserAdded(User NewUser) {
+            int id = NewUser.getID();
+            SharedPreferences.Editor prefsEditor = preferences.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(currentUser);
+            prefsEditor.putString("User", json);
+            prefsEditor.commit();
+        startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }
 }

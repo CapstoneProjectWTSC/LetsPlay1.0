@@ -40,7 +40,7 @@ public class  Settings extends AppCompatActivity implements OnClickListener, OnK
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_page);
+       // setContentView(R.layout.settings_page);
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
         int storedPreference = preferences.getInt("storedInt", 0);

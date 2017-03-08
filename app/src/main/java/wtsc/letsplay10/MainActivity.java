@@ -1,5 +1,7 @@
 package wtsc.letsplay10;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -14,58 +16,44 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
-import static wtsc.letsplay10.R.id.map;
-
 public class MainActivity extends AppCompatActivity implements
         OnCameraIdleListener,
-        OnUserDataLoaded,
         OnSportsDataLoaded,
         OnScheduleDataLoaded,
         OnFacitiliesDataLoaded,
         OnMapReadyCallback{
 
     // instance of the GetCurrentUser utility functions to get the user data from the database
-    static GetCurrentUser getUser;
+    static dbGetCurrentUser getUser;
     private User currentUser;       // stores the current user object
     private GetSportsList getSportsList;
     private List<Sport> allSportsList;
     private List<Facility> facilitiesList;
     private GoogleMap mMap;
-    private GetFacilitiesList getFacils;
+    private dbGetFacilitiesList getFacils;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main );
 
+        preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
+
+     //   SharedPreferences.Editor prefsEditor = preferences.edit(); // these line are for development
+    //    prefsEditor.clear();            // these line are for development
+     //   prefsEditor.apply();            // these line are for development
+
+        String json = preferences.getString("User", "");
+
+        if(json.equals(""))
+        {
+            startActivity(new Intent(getApplicationContext(),Introduction.class));
+        }
         SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
-
-    }
-
-
-    @Override
-    public void onCurrentUserDataLoaded(User user) {
-
-    }
-
-    @Override
-    public void onUserVerify(User user) {
-        if(user == null) {
-            getUser = new GetCurrentUser(MainActivity.this);
-            getUser.execute("ADD_NEW","Ricky","Stambach","gnameTest1",
-                            "123456","rstambach1@my.waketech.edu");
-        }
-    }
-
-    @Override
-    public void onNewUserAdded(User user) {
-        String gn = user.getGameName();
-        getSportsList = new GetSportsList(MainActivity.this);
-        getSportsList.execute();
     }
 
     @Override
@@ -92,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onCameraIdle() {
         // returns current bounds
         LatLngBounds curBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        getFacils = new GetFacilitiesList(MainActivity.this);
+        getFacils = new dbGetFacilitiesList(MainActivity.this);
         getFacils.execute(curBounds);
     }
 
