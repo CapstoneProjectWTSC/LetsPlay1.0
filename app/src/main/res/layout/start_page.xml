@@ -53,7 +53,6 @@
             android:layout_height="wrap_content"
             android:paddingTop="50dp"
             android:textStyle="bold"
-            android:textAlignment="textEnd"
             android:gravity="center"
             android:text="@string/passwordEntryText" />
         <EditText
