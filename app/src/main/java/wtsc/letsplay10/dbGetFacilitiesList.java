@@ -45,7 +45,12 @@ public class dbGetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Faci
                     LatLng sw = params[0].southwest;
                     LatLng ne = params[0].northeast;
 
-                    query = "select * from [Facility] WHERE "+
+                    query = "select f.[facility_ID],f.[Name],f.[Address1],f.[Address2]" +
+                            ",f.[City],f.[State],f.[Zip],f.[Lat],f.[Lng],f.[Notes]"+
+                            ",s.[schedule_ID]"+
+                            " from [facility] f join [schedule] s "+"" +
+                            "on f.[facility_ID] = s.[Facility_ID]"+
+                            " WHERE "+
                             "[Lat] > " + sw.latitude + " AND [Lat] < " + ne.latitude + " AND " +
                             "[Lng] > " + sw.longitude + " AND [Lng] < " + ne.longitude;
                 }
