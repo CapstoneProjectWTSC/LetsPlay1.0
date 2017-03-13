@@ -1,7 +1,5 @@
 package wtsc.letsplay10;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -54,9 +52,8 @@ GoogleApiClient.OnConnectionFailedListener,
     private List<Sport> allSportsList;
     private List<Facility> facilitiesList;
     private GoogleMap mMap;
-    private dbGetFacilitiesList getFacils;
     private SharedPreferences preferences;
-    private GetFacilitiesList getFacils;
+    private dbGetFacilitiesList getFacils;
   //  private dbGetFacilitiesList getFacils;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
