@@ -5,4 +5,6 @@
     <string name="passwordEntryText">Password:</string>
     <string name="passwordConfirmationText">Confirm Password:</string>
     <string name="confirmButton">Confirm</string>
+    <string name="signInButton">Sign In</string>
+    <string name="createAccountButton">Don\'t have an account? Create one!</string>
 </resources>
