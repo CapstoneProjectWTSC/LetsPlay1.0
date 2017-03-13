@@ -4,31 +4,29 @@ package wtsc.letsplay10;
  * May not be finished until I explicitly say so. I will commit this file so I can use it from work and from home.
  * Created by samal on 3/9/2017.
  */
-        import android.content.Context;
-        import android.content.Intent;
-        import android.preference.PreferenceManager;
-        import android.support.v7.app.AppCompatActivity;
-        import android.support.design.widget.Snackbar;
-        import android.os.Bundle;
-        import android.view.KeyEvent;
-        import android.view.View;
-        import android.widget.Button;
-        import android.widget.EditText;
-        import android.view.View.OnClickListener;
-        import android.view.View.OnKeyListener;
-        import org.apache.commons.validator.routines.EmailValidator;
-        import android.view.inputmethod.EditorInfo;
-        import android.view.inputmethod.InputMethodManager;
-        import android.content.SharedPreferences;
 
-        import com.google.gson.Gson;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+
+import com.google.gson.Gson;
 
 public class StartPage extends AppCompatActivity implements OnClickListener, OnKeyListener{
 
     private EditText emailField;
     private EditText passwordField;
     private Button signIn;
-    static GetCurrentUser getUser;
+    static dbGetCurrentUser getUser;
     private String emailFieldString;
     private String passwordFieldString;
 
