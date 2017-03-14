@@ -35,7 +35,7 @@ import java.util.List;
 //import android.location.Location;
 
 public class MainActivity extends AppCompatActivity implements
-        OnCameraIdleListener,
+
         OnSportsDataLoaded,
         OnScheduleDataLoaded,
         LocationListener,
@@ -43,17 +43,17 @@ public class MainActivity extends AppCompatActivity implements
         OnUserDataLoaded,
 GoogleApiClient.ConnectionCallbacks,
 GoogleApiClient.OnConnectionFailedListener,
-        OnMapReadyCallback {
+        OnMapReadyCallback,
+        OnCameraIdleListener{
 
     // instance of the GetCurrentUser utility functions to get the user data from the database
     static dbGetCurrentUser getUser;
     private User currentUser;       // stores the current user object
-    private GetSportsList getSportsList;
+    private dbGetSportsList dbGetSportsList;
     private List<Sport> allSportsList;
     private List<Facility> facilitiesList;
     private GoogleMap mMap;
-    private SharedPreferences preferences;
-    private dbGetFacilitiesList getFacils;
+
   //  private dbGetFacilitiesList getFacils;
   //  private dbGetFacilitiesList getFacils;
     private GoogleApiClient mGoogleApiClient;
@@ -82,9 +82,9 @@ GoogleApiClient.OnConnectionFailedListener,
         {
             startActivity(new Intent(getApplicationContext(),Introduction.class));
         }
+
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-    //    SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
     }
 
@@ -108,8 +108,8 @@ GoogleApiClient.OnConnectionFailedListener,
     @Override
     public void onNewUserAdded(User user) {
         String gn = user.getGameName();
-        getSportsList = new GetSportsList(MainActivity.this);
-        getSportsList.execute();
+        dbGetSportsList = new dbGetSportsList(MainActivity.this);
+        dbGetSportsList.execute();
 
     }
 
@@ -134,7 +134,9 @@ GoogleApiClient.OnConnectionFailedListener,
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(wtscPos, 10));
         */
         mMap = map;
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);     //change map type
+        mMap.setOnCameraIdleListener(this);
+        map.getUiSettings().setZoomControlsEnabled(true);
+ //       mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);     //change map type
 
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -143,6 +145,12 @@ GoogleApiClient.OnConnectionFailedListener,
                     == PackageManager.PERMISSION_GRANTED) {
                 buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
+            }
+            else
+            {
+                LatLng wtscPos = new LatLng(35.651143, -78.704099);
+                map.addMarker(new MarkerOptions().position(wtscPos).title("Wake Tech Software Corp"));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(wtscPos, 10));
             }
         }
         else {

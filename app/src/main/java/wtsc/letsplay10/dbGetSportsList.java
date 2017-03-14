@@ -13,13 +13,13 @@ import java.util.List;
  * Created by why76_000 on 2/18/2017.
  */
 
-public class GetSportsList extends AsyncTask<String,String,List<Sport>> {
+public class dbGetSportsList extends AsyncTask<String,String,List<Sport>> {
 
     private dbConnectionClass connectionClass;
     private OnSportsDataLoaded dataLoaded;
     private List<Sport> sportsList;
 
-    public GetSportsList(OnSportsDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetSportsList(OnSportsDataLoaded activityContext){this.dataLoaded = activityContext;}
 
     @Override
     protected void onPreExecute() {
