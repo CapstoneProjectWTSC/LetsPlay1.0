@@ -55,12 +55,15 @@ GoogleApiClient.OnConnectionFailedListener,
     private SharedPreferences preferences;
     private dbGetFacilitiesList getFacils;
   //  private dbGetFacilitiesList getFacils;
+  //  private dbGetFacilitiesList getFacils;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mLastLocation;
     private Marker mCurrLocationMarker;
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     public static final String TAG = MainActivity.class.getSimpleName();
+    private dbGetFacilitiesList getFacils;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
