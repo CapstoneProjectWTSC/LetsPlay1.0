@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".StartPage">
+        <activity android:name=".SignIn">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
