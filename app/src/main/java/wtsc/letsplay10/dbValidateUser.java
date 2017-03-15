@@ -35,7 +35,7 @@ public class dbValidateUser extends AsyncTask<String,String,User> {
             Connection con = connectionClass.CONN();
             if (con == null) {
             } else {
-                String query = "select * from [User] WHERE [Email] = '"+ (String) params[0] + "'";
+                String query = "select * from [User] WHERE [Email] = '"+ params[0] + "'";
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
                 if(rs.next()){

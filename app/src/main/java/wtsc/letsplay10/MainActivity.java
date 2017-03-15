@@ -37,7 +37,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         LocationListener,
-        OnFacitiliesDataLoaded,
+        OnFacilitiesDataLoaded,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         OnMapReadyCallback,
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onFacitiliesDataLoaded(List<Facility> facilities) {
+    public void onFacilitiesDataLoaded(List<Facility> facilities) {
         facilitiesList = facilities;
         if (facilities.size() > 0) {
             mMap.clear();
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-                // Show an expanation to the user *asynchronously* -- don't block
+                // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
 

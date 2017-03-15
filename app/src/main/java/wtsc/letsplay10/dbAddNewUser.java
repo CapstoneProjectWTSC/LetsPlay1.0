@@ -63,7 +63,7 @@ public class dbAddNewUser extends AsyncTask<String,String,User> {
         }
         catch (Exception ex)
         {
-            Log.e("ERRO", ex.getMessage());
+            Log.e("ERROR", ex.getMessage());
         }
 
         return newUser;

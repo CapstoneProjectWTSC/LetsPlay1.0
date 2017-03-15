@@ -41,7 +41,7 @@ public class dbGetSportsList extends AsyncTask<String,String,List<Sport>> {
                 String query;
                 if(params.length > 0 )
                 {
-                    query = "select * from [SportsType] WHERE ID = '"+(String)params[0]+"'";
+                    query = "select * from [SportsType] WHERE ID = '"+ params[0]+"'";
                 }
                 else
                 {

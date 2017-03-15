@@ -131,7 +131,7 @@ public class Introduction extends AppCompatActivity
         }
         else
         {
-            // Email and GameName are availble to use add new currentUser to database
+            // Email and GameName are available to use add new currentUser to database
             currentUser.setEmail(emailSubmissionString);
             currentUser.setGameName(usernameSubmissionString);
             currentUser.setPassword(passwordSubmissionString);

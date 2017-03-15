@@ -17,10 +17,10 @@ import java.util.List;
 
 public class dbGetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Facility>> {
     private dbConnectionClass connectionClass;
-    private OnFacitiliesDataLoaded dataLoaded;
+    private OnFacilitiesDataLoaded dataLoaded;
     private List<Facility> facilitiesList;
 
-    public dbGetFacilitiesList(OnFacitiliesDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetFacilitiesList(OnFacilitiesDataLoaded activityContext){this.dataLoaded = activityContext;}
 
     @Override
     protected void onPreExecute() {
@@ -88,6 +88,6 @@ public class dbGetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Faci
 
     @Override
     protected void onPostExecute(List<Facility> facilitiesList){
-        dataLoaded.onFacitiliesDataLoaded(facilitiesList);
+        dataLoaded.onFacilitiesDataLoaded(facilitiesList);
     }
 }

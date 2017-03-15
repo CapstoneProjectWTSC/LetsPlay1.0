@@ -29,7 +29,7 @@ public class dbFindGameName extends AsyncTask<String,String,Boolean> {
             Connection con = connectionClass.CONN();
             if (con == null) {
             } else {
-                String query = "select * from [User] WHERE [GameName] = '"+ (String) params[0] + "'";
+                String query = "select * from [User] WHERE [GameName] = '"+ params[0] + "'";
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
                 if(rs.next()){isInDatabase = true;}

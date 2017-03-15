@@ -45,14 +45,14 @@ public class dbGetCurrentUser extends AsyncTask<String,String,User> {
                     switch (queryParam) {
 
                         case "VERIFY":
-                            query = "select * from [User] WHERE [Email] = '" + (String) params[1] +
-                                    "' AND [Password] = '" + (String) params[2] +"'";
+                            query = "select * from [User] WHERE [Email] = '" + params[1] +
+                                    "' AND [Password] = '" + params[2] +"'";
                             break;
                         case "FIND_GAME_NAME":
-                            query = "select * from [User] WHERE [GameName] = '" + (String) params[1] + "'";
+                            query = "select * from [User] WHERE [GameName] = '" + params[1] + "'";
                             break;
                         case "LOAD":
-                            query = "select * from [User] WHERE [Email] = '" + (String) params[1] + "'";
+                            query = "select * from [User] WHERE [Email] = '" + params[1] + "'";
                             break;
                         case "ADD_NEW":
                             query = "INSERT INTO [User] ([First_Name],[Last_Name],[GameName],[Password],[Email])" +
@@ -99,7 +99,7 @@ public class dbGetCurrentUser extends AsyncTask<String,String,User> {
         }
         catch (Exception ex)
         {
-            Log.e("ERRO", ex.getMessage());
+            Log.e("ERROR", ex.getMessage());
         }
 
         return newUser;

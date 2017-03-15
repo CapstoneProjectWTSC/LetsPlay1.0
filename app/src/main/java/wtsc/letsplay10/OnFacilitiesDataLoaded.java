@@ -6,6 +6,6 @@ import java.util.List;
  * Created by Ricky Stambach on 3/3/2017.
  */
 
-public interface OnFacitiliesDataLoaded {
-    void onFacitiliesDataLoaded(List<Facility> facility);
+public interface OnFacilitiesDataLoaded {
+    void onFacilitiesDataLoaded(List<Facility> facility);
 }

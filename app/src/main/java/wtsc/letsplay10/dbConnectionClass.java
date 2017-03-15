@@ -14,7 +14,7 @@ import java.sql.SQLException;
 
 public class dbConnectionClass {
     String ip = "wtsc.database.windows.net";        // connection variables
-    String classs = "net.sourceforge.jtds.jdbc.Driver";
+    String className = "net.sourceforge.jtds.jdbc.Driver";
     String db = "LetsPlay";
     String un = "WakeTechSC@wtsc";                  // user name
     String password = "Capstone1";                  // password
@@ -27,7 +27,7 @@ public class dbConnectionClass {
         java.sql.Connection conn = null;
         String ConnURL = null;
         try {
-            Class.forName(classs);                  // sets jdbc driver
+            Class.forName(className);                  // sets jdbc driver
             ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"       // sets connection URL
                     + "databaseName=" + db + ";user=" + un + ";password="
                     + password + ";";
@@ -35,11 +35,11 @@ public class dbConnectionClass {
 
             // catch exceptions
         } catch (SQLException se) {
-            Log.e("ERRO", se.getMessage());
+            Log.e("ERROR", se.getMessage());
         } catch (ClassNotFoundException e) {
-            Log.e("ERRO", e.getMessage());
+            Log.e("ERROR", e.getMessage());
         } catch (Exception e) {
-            Log.e("ERRO", e.getMessage());
+            Log.e("ERROR", e.getMessage());
         }
         return conn;        // returns the connection object
     }
