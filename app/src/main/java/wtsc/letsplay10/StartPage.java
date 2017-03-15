@@ -47,16 +47,7 @@ public class StartPage extends AppCompatActivity implements
 
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
-
-        String json = preferences.getString("User", "");
-
-
-   //     if (!json.equals(""))
-   //     {
-   //         Gson gson = new Gson();
-  //          user = gson.fromJson(json, User.class);
-   //         startActivity(new Intent(getApplicationContext(), Account.class));
-   //     }
+ //       String json = preferences.getString("User", "");
 
         emailField = (EditText) findViewById(R.id.emailField);
         passwordField = (EditText) findViewById(R.id.passwordField);
@@ -65,7 +56,6 @@ public class StartPage extends AppCompatActivity implements
         passwordField.setOnKeyListener(this);
 
         signIn = (Button) findViewById(R.id.signIn);
-
         signIn.setOnClickListener(this);
     }
 

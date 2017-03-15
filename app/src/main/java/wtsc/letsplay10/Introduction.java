@@ -46,9 +46,7 @@ public class Introduction extends AppCompatActivity
         setContentView(R.layout.intro_page);
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
-
         String json = preferences.getString("User", "");
-
 
         emailSubmission = (EditText) findViewById(R.id.emailSubmission);
         usernameSubmission = (EditText) findViewById(R.id.usernameSubmission);
@@ -107,45 +105,12 @@ public class Introduction extends AppCompatActivity
                 passwordSubmissionString= passwordSubmission.getText().toString();
                 passwordConfirmationString= passwordConfirmation.getText().toString();
 
-                /*if (!EmailValidator.getInstance().isValid(emailSubmissionString)){
-                    emailSubmission.setError("Please enter a valid e-mail.");
-                    break;
-                }
-
-                PasswordValidation validate = new PasswordValidation();
-
-                String validationResult = validate.validateNewPass(passwordSubmissionString, passwordConfirmationString);
-
-                if(!validationResult.equals("Success!")){
-                    passwordSubmission.setError(validationResult);
-                    break;
-                }*/
-
-                //if(usernname is in database){
-                // usernameSubmission.setError("That username is already in use.");
-                //break;
-                //}
                 db_findGameName = new dbFindGameName(Introduction.this);    //check if currentUser is in database
                 db_findGameName.execute(usernameSubmissionString);      // returns in onDBFindGameName
-
-                //--------------------------See onDBFindGameName -------------------------------------------
-                //if(email is in database){
-                // emailSubmission.setError("That e-mail is already in use.");
-                //break;
-                //}
-
-                //send username email, password combo to database
-
-                //setContentView(R.layout.'name of the map page');
-
-
-
-             //   startActivity(new Intent(getApplicationContext(), Account.class));
 
                 break;
         }
     }
-
 
     @Override
     public void onDBFindGameName(boolean isInDatabase) {

@@ -33,36 +33,23 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
-//import android.location.Location;
+
 
 public class MainActivity extends AppCompatActivity implements
-
-        OnSportsDataLoaded,
-        OnScheduleDataLoaded,
         LocationListener,
         OnFacitiliesDataLoaded,
-        OnUserDataLoaded,
-GoogleApiClient.ConnectionCallbacks,
-GoogleApiClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
         OnMapReadyCallback,
         OnCameraIdleListener{
 
     // instance of the GetCurrentUser utility functions to get the user data from the database
-    static dbGetCurrentUser getUser;
-    private User currentUser;       // stores the current user object
-    private dbGetSportsList dbGetSportsList;
-    private List<Sport> allSportsList;
     private List<Facility> facilitiesList;
     private GoogleMap mMap;
-
-  //  private dbGetFacilitiesList getFacils;
-  //  private dbGetFacilitiesList getFacils;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mLastLocation;
     private Marker mCurrLocationMarker;
-    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-    public static final String TAG = MainActivity.class.getSimpleName();
     private dbGetFacilitiesList getFacils;
     private SharedPreferences preferences;
 
@@ -76,11 +63,6 @@ GoogleApiClient.OnConnectionFailedListener,
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
 
-    //    SharedPreferences.Editor prefsEditor = preferences.edit(); // these line are for development
-   //     prefsEditor.clear();            // these line are for development
-   //     prefsEditor.apply();            // these line are for development
-     //   startActivity(new Intent(getApplicationContext(),StartPage.class));
-
         String json = preferences.getString("User", "");
 
         if(json.equals(""))
@@ -93,51 +75,8 @@ GoogleApiClient.OnConnectionFailedListener,
         mapFragment.getMapAsync(this);
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    @Override
-    public void onCurrentUserDataLoaded(User user) {
-
-    }
-
-    @Override
-    public void onUserVerify(User user) {
-        if (user == null) {
-            getUser = new dbGetCurrentUser(MainActivity.this);
-            getUser.execute("ADD_NEW", "Ricky", "Stambach", "gnameTest1",
-                    "123456", "rstambach1@my.waketech.edu");
-        }
-    }
-
-    @Override
-    public void onNewUserAdded(User user) {
-        String gn = user.getGameName();
-        dbGetSportsList = new dbGetSportsList(MainActivity.this);
-        dbGetSportsList.execute();
-
-    }
-
-    @Override
-    public void onSportsDataLoaded(List<Sport> sports) {
-        int i = sports.size();
-    }
-
-    @Override
-    public void onScheduleDataLoaded(List<Schedule> schedules) {
-        int i = schedules.size();
-    }
-
-    @Override
+     @Override
     public void onMapReady(GoogleMap map) {
-        /*
-        mMap = map;
-        mMap.setOnCameraIdleListener(this);
-        map.getUiSettings().setZoomControlsEnabled(true);
-        LatLng wtscPos = new LatLng(35.651143, -78.704099);
-        map.addMarker(new MarkerOptions().position(wtscPos).title("Wake Tech Software Corp"));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(wtscPos, 10));
-        */
         mMap = map;
         mMap.setOnCameraIdleListener(this);
         map.getUiSettings().setZoomControlsEnabled(true);
