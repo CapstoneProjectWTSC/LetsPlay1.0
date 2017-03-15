@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -21,35 +22,41 @@ import android.widget.EditText;
 
 import com.google.gson.Gson;
 
-public class StartPage extends AppCompatActivity implements OnClickListener, OnKeyListener{
+public class StartPage extends AppCompatActivity implements
+        OnClickListener,
+        OnKeyListener,
+        OndbVerifyPassword{
 
     private EditText emailField;
     private EditText passwordField;
     private Button signIn;
-    static dbGetCurrentUser getUser;
+    private dbValidateUser vUser;
     private String emailFieldString;
     private String passwordFieldString;
-
-    private User user;
-
+    private User currentUser;
     private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.intro_page);
+        setContentView(R.layout.start_page );
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setIcon(R.drawable.lets_play_icon5);
+
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
 
         String json = preferences.getString("User", "");
 
 
-        if (!json.equals(""))
-        {
-            Gson gson = new Gson();
-            user = gson.fromJson(json, User.class);
-            startActivity(new Intent(getApplicationContext(), Account.class));
-        }
+   //     if (!json.equals(""))
+   //     {
+   //         Gson gson = new Gson();
+  //          user = gson.fromJson(json, User.class);
+   //         startActivity(new Intent(getApplicationContext(), Account.class));
+   //     }
 
         emailField = (EditText) findViewById(R.id.emailField);
         passwordField = (EditText) findViewById(R.id.passwordField);
@@ -95,28 +102,35 @@ public class StartPage extends AppCompatActivity implements OnClickListener, OnK
                 passwordField.setError(null);
                 emailFieldString = emailField.getText().toString();
                 passwordFieldString= passwordField.getText().toString();
-
-                user = getUser.doInBackground("VERIFY", emailFieldString);
-
-                if (user == null)
-                {
-                    CharSequence message = "Invalid email/password credentials";
-                    Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signIn), message, Snackbar.LENGTH_SHORT);
-                    invalidLogin.show();
-                    break;
-                }
-
-
-                SharedPreferences.Editor prefsEditor = preferences.edit();
-                Gson gson = new Gson();
-                String json = gson.toJson(user);
-                prefsEditor.putString("User", json);
-                prefsEditor.commit();
-
-                startActivity(new Intent(getApplicationContext(), Account.class));
+                vUser = new dbValidateUser(StartPage.this);
+                vUser.execute(emailFieldString,passwordFieldString);
+//                startActivity(new Intent(getApplicationContext(), Account.class));
 
                 break;
         }
     }
+
+    @Override
+    public void onDBPasswordVerified(User user) {
+        if(vUser.getIsValidUser()){
+            currentUser = user;
+            SharedPreferences.Editor prefsEditor = preferences.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(currentUser);
+            prefsEditor.putString("User", json);
+            prefsEditor.commit();
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        }
+        else{
+            String message;
+            if(vUser.getIsValidEmail()){
+                message = "Invalid password error";
+            }
+            else {message = "Invalid email error";}
+            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signIn), message, Snackbar.LENGTH_SHORT);
+            invalidLogin.show();
+        }
+    }
+
 }
 

@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -69,18 +70,22 @@ GoogleApiClient.OnConnectionFailedListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setIcon(R.drawable.lets_play_icon5);
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
 
-     //   SharedPreferences.Editor prefsEditor = preferences.edit(); // these line are for development
-    //    prefsEditor.clear();            // these line are for development
-     //   prefsEditor.apply();            // these line are for development
+    //    SharedPreferences.Editor prefsEditor = preferences.edit(); // these line are for development
+   //     prefsEditor.clear();            // these line are for development
+   //     prefsEditor.apply();            // these line are for development
+     //   startActivity(new Intent(getApplicationContext(),StartPage.class));
 
         String json = preferences.getString("User", "");
 
         if(json.equals(""))
         {
-            startActivity(new Intent(getApplicationContext(),Introduction.class));
+            startActivity(new Intent(getApplicationContext(),StartPage.class));
         }
 
         SupportMapFragment mapFragment =

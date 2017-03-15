@@ -57,12 +57,7 @@ public class dbGetCurrentUser extends AsyncTask<String,String,User> {
                         case "ADD_NEW":
                             query = "INSERT INTO [User] ([First_Name],[Last_Name],[GameName],[Password],[Email])" +
                                     "  VALUES ('"+params[1] +"','"+params[2]+"','"+params[3]+"','"+params[4]+"','"+ params[5]+"')";
-                            newUser = new User();
-                            newUser.setFirstName(params[1]);
-                            newUser.setLastName(params[2]);
-                            newUser.setGameName(params[3]);
-                            newUser.setPassword(params[4]);
-                            newUser.setEmail(params[5]);
+
                             break;
                         default:
                             query = "select * from [User]";
