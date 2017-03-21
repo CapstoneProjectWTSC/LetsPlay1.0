@@ -22,10 +22,11 @@ import android.widget.EditText;
 
 import com.google.gson.Gson;
 
-public class StartPage extends AppCompatActivity implements
+public class SignIn extends AppCompatActivity implements
         OnClickListener,
         OnKeyListener,
         OndbVerifyPassword{
+
 
     private EditText emailField;
     private EditText passwordField;
@@ -47,7 +48,16 @@ public class StartPage extends AppCompatActivity implements
 
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
- //       String json = preferences.getString("User", "");
+
+        String json = preferences.getString("User", "");
+
+
+        if (!json.equals(""))
+        {
+            Gson gson = new Gson();
+            currentUser = gson.fromJson(json, User.class);
+            startActivity(new Intent(getApplicationContext(), Account.class));
+        }
 
         emailField = (EditText) findViewById(R.id.emailField);
         passwordField = (EditText) findViewById(R.id.passwordField);
@@ -56,6 +66,7 @@ public class StartPage extends AppCompatActivity implements
         passwordField.setOnKeyListener(this);
 
         signIn = (Button) findViewById(R.id.signIn);
+
         signIn.setOnClickListener(this);
     }
 
@@ -92,9 +103,6 @@ public class StartPage extends AppCompatActivity implements
                 passwordField.setError(null);
                 emailFieldString = emailField.getText().toString();
                 passwordFieldString= passwordField.getText().toString();
-                vUser = new dbValidateUser(StartPage.this);
-                vUser.execute(emailFieldString,passwordFieldString);
-//                startActivity(new Intent(getApplicationContext(), Account.class));
 
                 break;
         }
@@ -121,6 +129,5 @@ public class StartPage extends AppCompatActivity implements
             invalidLogin.show();
         }
     }
-
 }
 

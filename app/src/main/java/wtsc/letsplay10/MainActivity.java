@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements
         String json = preferences.getString("User", "");
 
         if (json.equals("")) {
-            startActivity(new Intent(getApplicationContext(), StartPage.class));
+            startActivity(new Intent(getApplicationContext(), SignIn.class));
         }
 
         SupportMapFragment mapFragment =
