@@ -7,4 +7,6 @@
     <string name="confirmButton">Confirm</string>
     <string name="signInButton">Sign In</string>
     <string name="createAccountButton">Don\'t have an account? Create one!</string>
+    <string name="action_favorite">Favorite Action</string>
+    <string name="action_settings">Action Settings</string>
 </resources>
