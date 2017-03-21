@@ -23,7 +23,7 @@ package wtsc.letsplay10;
 
         import com.google.gson.Gson;
 
-public class StartPage extends AppCompatActivity implements OnClickListener, OnKeyListener{
+public class SignIn extends AppCompatActivity implements OnClickListener, OnKeyListener {
 
     private EditText emailField;
     private EditText passwordField;
@@ -46,8 +46,7 @@ public class StartPage extends AppCompatActivity implements OnClickListener, OnK
         String json = preferences.getString("User", "");
 
 
-        if (!json.equals(""))
-        {
+        if (!json.equals("")) {
             Gson gson = new Gson();
             user = gson.fromJson(json, User.class);
             startActivity(new Intent(getApplicationContext(), Account.class));
@@ -70,14 +69,13 @@ public class StartPage extends AppCompatActivity implements OnClickListener, OnK
         if (keyCode == EditorInfo.IME_ACTION_SEARCH ||
                 keyCode == EditorInfo.IME_ACTION_DONE ||
                 event.getAction() == KeyEvent.ACTION_DOWN &&
-                        event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
-        {
+                        event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
             if (!event.isShiftPressed()) {
                 switch (view.getId()) {
                     case R.id.emailSubmission:
                         passwordField.requestFocus();
                         break;
-                    case R.id. passwordSubmission:
+                    case R.id.passwordSubmission:
                         signIn.requestFocus();
                         InputMethodManager imm = (InputMethodManager) getSystemService(
                                 INPUT_METHOD_SERVICE);
@@ -96,12 +94,11 @@ public class StartPage extends AppCompatActivity implements OnClickListener, OnK
             case R.id.signIn:
                 passwordField.setError(null);
                 emailFieldString = emailField.getText().toString();
-                passwordFieldString= passwordField.getText().toString();
+                passwordFieldString = passwordField.getText().toString();
 
                 user = getUser.doInBackground("VERIFY", emailFieldString);
 
-                if (user == null)
-                {
+                if (user == null) {
                     CharSequence message = "Invalid email/password credentials";
                     Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signIn), message, Snackbar.LENGTH_SHORT);
                     invalidLogin.show();
@@ -121,4 +118,3 @@ public class StartPage extends AppCompatActivity implements OnClickListener, OnK
         }
     }
 }
-
