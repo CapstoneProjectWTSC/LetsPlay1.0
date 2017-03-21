@@ -22,7 +22,7 @@ import android.widget.EditText;
 
 import com.google.gson.Gson;
 
-public class StartPage extends AppCompatActivity implements
+public class SignInPage extends AppCompatActivity implements
         OnClickListener,
         OnKeyListener,
         OndbVerifyPassword{
@@ -92,7 +92,7 @@ public class StartPage extends AppCompatActivity implements
                 passwordField.setError(null);
                 emailFieldString = emailField.getText().toString();
                 passwordFieldString= passwordField.getText().toString();
-                vUser = new dbValidateUser(StartPage.this);
+                vUser = new dbValidateUser(SignInPage.this);
                 vUser.execute(emailFieldString,passwordFieldString);
 //                startActivity(new Intent(getApplicationContext(), Account.class));
 
