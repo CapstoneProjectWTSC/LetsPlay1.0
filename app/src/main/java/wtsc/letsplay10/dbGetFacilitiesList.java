@@ -15,16 +15,16 @@ import java.util.List;
  * Created by Ricky Stambach on 3/3/2017.
  */
 
-public class GetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Facility>> {
-    private ConnectionClass connectionClass;
-    private OnFacitiliesDataLoaded dataLoaded;
+public class dbGetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Facility>> {
+    private dbConnectionClass connectionClass;
+    private OnFacilitiesDataLoaded dataLoaded;
     private List<Facility> facilitiesList;
 
-    public GetFacilitiesList(OnFacitiliesDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetFacilitiesList(OnFacilitiesDataLoaded activityContext){this.dataLoaded = activityContext;}
 
     @Override
     protected void onPreExecute() {
-        connectionClass = new ConnectionClass();
+        connectionClass = new dbConnectionClass();
     }
 
     @Override
@@ -45,7 +45,12 @@ public class GetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Facili
                     LatLng sw = params[0].southwest;
                     LatLng ne = params[0].northeast;
 
-                    query = "select * from [Facility] WHERE "+
+                    query = "select f.[facility_ID],f.[Name],f.[Address1],f.[Address2]" +
+                            ",f.[City],f.[State],f.[Zip],f.[Lat],f.[Lng],f.[Notes]"+
+                            ",s.[schedule_ID]"+
+                            " from [facility] f join [schedule] s "+"" +
+                            "on f.[facility_ID] = s.[Facility_ID]"+
+                            " WHERE "+
                             "[Lat] > " + sw.latitude + " AND [Lat] < " + ne.latitude + " AND " +
                             "[Lng] > " + sw.longitude + " AND [Lng] < " + ne.longitude;
                 }
@@ -83,6 +88,6 @@ public class GetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Facili
 
     @Override
     protected void onPostExecute(List<Facility> facilitiesList){
-        dataLoaded.onFacitiliesDataLoaded(facilitiesList);
+        dataLoaded.onFacilitiesDataLoaded(facilitiesList);
     }
 }

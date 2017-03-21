@@ -2,6 +2,7 @@ package wtsc.letsplay10;
 
 import android.os.AsyncTask;
 import android.util.Log;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -13,20 +14,20 @@ import java.sql.Statement;
  * Created by Ricky Stambach on 2/15/2017.
  */
 
-public class GetCurrentUser extends AsyncTask<String,String,User> {
+public class dbGetCurrentUser extends AsyncTask<String,String,User> {
 
-    private ConnectionClass connectionClass;
+    private dbConnectionClass connectionClass;
     private OnUserDataLoaded dataLoaded;
     private User newUser;
     private String queryParam;
 
-    public GetCurrentUser(OnUserDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetCurrentUser(OnUserDataLoaded activityContext){this.dataLoaded = activityContext;}
 
     public User GetCurrentUser(){return new User(newUser);}
 
     @Override
     protected void onPreExecute() {
-        connectionClass = new ConnectionClass();
+        connectionClass = new dbConnectionClass();
     }
 
     @Override
@@ -44,20 +45,19 @@ public class GetCurrentUser extends AsyncTask<String,String,User> {
                     switch (queryParam) {
 
                         case "VERIFY":
-                            query = "select * from [User] WHERE Email = '" + (String) params[1] + "'";
+                            query = "select * from [User] WHERE [Email] = '" + params[1] +
+                                    "' AND [Password] = '" + params[2] +"'";
+                            break;
+                        case "FIND_GAME_NAME":
+                            query = "select * from [User] WHERE [GameName] = '" + params[1] + "'";
                             break;
                         case "LOAD":
-                            query = "select * from [User] WHERE Email = '" + (String) params[1] + "'";
+                            query = "select * from [User] WHERE [Email] = '" + params[1] + "'";
                             break;
                         case "ADD_NEW":
                             query = "INSERT INTO [User] ([First_Name],[Last_Name],[GameName],[Password],[Email])" +
                                     "  VALUES ('"+params[1] +"','"+params[2]+"','"+params[3]+"','"+params[4]+"','"+ params[5]+"')";
-                            newUser = new User();
-                            newUser.setFirstName(params[1]);
-                            newUser.setLastName(params[2]);
-                            newUser.setGameName(params[3]);
-                            newUser.setPassword(params[4]);
-                            newUser.setEmail(params[5]);
+
                             break;
                         default:
                             query = "select * from [User]";
@@ -99,7 +99,7 @@ public class GetCurrentUser extends AsyncTask<String,String,User> {
         }
         catch (Exception ex)
         {
-            Log.e("ERRO", ex.getMessage());
+            Log.e("ERROR", ex.getMessage());
         }
 
         return newUser;

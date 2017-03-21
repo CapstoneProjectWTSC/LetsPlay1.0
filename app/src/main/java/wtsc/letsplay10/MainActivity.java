@@ -1,6 +1,8 @@
 package wtsc.letsplay10;
 
 import android.Manifest;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -10,6 +12,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -32,89 +38,96 @@ import java.util.List;
 
 import static wtsc.letsplay10.R.id.map;
 
-//import android.location.Location;
 
 public class MainActivity extends AppCompatActivity implements
-        OnCameraIdleListener,
-        OnUserDataLoaded,
-        OnSportsDataLoaded,
-        OnScheduleDataLoaded,
         LocationListener,
-        OnFacitiliesDataLoaded,
-GoogleApiClient.ConnectionCallbacks,
-GoogleApiClient.OnConnectionFailedListener,
-        OnMapReadyCallback {
+        OnFacilitiesDataLoaded,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        OnMapReadyCallback,
+        OnCameraIdleListener {
 
     // instance of the GetCurrentUser utility functions to get the user data from the database
-    static GetCurrentUser getUser;
-    private User currentUser;       // stores the current user object
-    private GetSportsList getSportsList;
-    private List<Sport> allSportsList;
     private List<Facility> facilitiesList;
     private GoogleMap mMap;
-    private GetFacilitiesList getFacils;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mLastLocation;
     private Marker mCurrLocationMarker;
-    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-    public static final String TAG = MainActivity.class.getSimpleName();
+    private dbGetFacilitiesList getFacils;
+    private SharedPreferences preferences;
+    private Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //  ActionBar actionBar = getSupportActionBar();
+        //  actionBar.setDisplayShowHomeEnabled(true);
+        //   actionBar.setIcon(R.drawable.lets_play_icon5);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
+        // Find the toolbar view inside the activity layout
+        toolbar = (Toolbar) findViewById(R.id.menu_bar );
+        // Sets the Toolbar to act as the ActionBar for this Activity window.
+        // Make sure the toolbar exists in the activity and is not null
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.lets_play_icon5);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+   //     toolbar.setNavigationIcon(R.drawable.ic_menu_moreoverflow );
+     //   toolbar.setNavigationContentDescription("more menu");
+       // toolbar.setLogo(R.drawable.lets_play_icon5);
+     //   toolbar.setLogoDescription("LetsPlay");
+
+        preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
+
+        String json = preferences.getString("User", "");
+
+        if (json.equals("")) {
+            startActivity(new Intent(getApplicationContext(), StartPage.class));
+        }
+
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
     @Override
-    public void onCurrentUserDataLoaded(User user) {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
 
-    }
+            case R.id.action_favorite:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return true;
 
-    @Override
-    public void onUserVerify(User user) {
-        if (user == null) {
-            getUser = new GetCurrentUser(MainActivity.this);
-            getUser.execute("ADD_NEW", "Ricky", "Stambach", "gnameTest1",
-                    "123456", "rstambach1@my.waketech.edu");
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
         }
     }
 
     @Override
-    public void onNewUserAdded(User user) {
-        String gn = user.getGameName();
-        getSportsList = new GetSportsList(MainActivity.this);
-        getSportsList.execute();
-    }
-
-    @Override
-    public void onSportsDataLoaded(List<Sport> sports) {
-        int i = sports.size();
-    }
-
-    @Override
-    public void onScheduleDataLoaded(List<Schedule> schedules) {
-        int i = schedules.size();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.toolbar_menu , menu);
+        return true;
     }
 
     @Override
     public void onMapReady(GoogleMap map) {
-        /*
         mMap = map;
         mMap.setOnCameraIdleListener(this);
         map.getUiSettings().setZoomControlsEnabled(true);
-        LatLng wtscPos = new LatLng(35.651143, -78.704099);
-        map.addMarker(new MarkerOptions().position(wtscPos).title("Wake Tech Software Corp"));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(wtscPos, 10));
-        */
-        mMap = map;
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);     //change map type
+        //       mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);     //change map type
 
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -123,9 +136,12 @@ GoogleApiClient.OnConnectionFailedListener,
                     == PackageManager.PERMISSION_GRANTED) {
                 buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
+            } else {
+                LatLng wtscPos = new LatLng(35.651143, -78.704099);
+                map.addMarker(new MarkerOptions().position(wtscPos).title("Wake Tech Software Corp"));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(wtscPos, 10));
             }
-        }
-        else {
+        } else {
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
@@ -135,12 +151,12 @@ GoogleApiClient.OnConnectionFailedListener,
     public void onCameraIdle() {
         // returns current bounds
         LatLngBounds curBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        getFacils = new GetFacilitiesList(MainActivity.this);
+        getFacils = new dbGetFacilitiesList(MainActivity.this);
         getFacils.execute(curBounds);
     }
 
     @Override
-    public void onFacitiliesDataLoaded(List<Facility> facilities) {
+    public void onFacilitiesDataLoaded(List<Facility> facilities) {
         facilitiesList = facilities;
         if (facilities.size() > 0) {
             mMap.clear();
@@ -150,6 +166,9 @@ GoogleApiClient.OnConnectionFailedListener,
             }
         }
     }
+
+    // Menu icons are inflated just as they were with actionbar
+
 
 
     //////////////////////////////////////////////////////////////////////////////////
@@ -169,8 +188,7 @@ GoogleApiClient.OnConnectionFailedListener,
     }
 
     @Override
-    public void onConnected(@Nullable Bundle bundle)
-    {
+    public void onConnected(@Nullable Bundle bundle) {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
@@ -178,7 +196,7 @@ GoogleApiClient.OnConnectionFailedListener,
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,this);      //altered
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);      //altered
         }
 
     }
@@ -194,8 +212,7 @@ GoogleApiClient.OnConnectionFailedListener,
     }
 
     //@Override
-    public void onLocationChanged(Location location)
-    {
+    public void onLocationChanged(Location location) {
         mLastLocation = location;
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
@@ -222,7 +239,8 @@ GoogleApiClient.OnConnectionFailedListener,
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-    public boolean checkLocationPermission(){
+
+    public boolean checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -231,7 +249,7 @@ GoogleApiClient.OnConnectionFailedListener,
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-                // Show an expanation to the user *asynchronously* -- don't block
+                // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
 
@@ -252,6 +270,7 @@ GoogleApiClient.OnConnectionFailedListener,
             return true;
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {

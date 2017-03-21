@@ -1,6 +1,7 @@
 package wtsc.letsplay10;
 
 import android.os.AsyncTask;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -12,17 +13,17 @@ import java.util.List;
  * Created by why76_000 on 2/18/2017.
  */
 
-public class GetSportsList extends AsyncTask<String,String,List<Sport>> {
+public class dbGetSportsList extends AsyncTask<String,String,List<Sport>> {
 
-    private ConnectionClass connectionClass;
+    private dbConnectionClass connectionClass;
     private OnSportsDataLoaded dataLoaded;
     private List<Sport> sportsList;
 
-    public GetSportsList(OnSportsDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetSportsList(OnSportsDataLoaded activityContext){this.dataLoaded = activityContext;}
 
     @Override
     protected void onPreExecute() {
-        connectionClass = new ConnectionClass();
+        connectionClass = new dbConnectionClass();
     }
 
     @Override
@@ -40,7 +41,7 @@ public class GetSportsList extends AsyncTask<String,String,List<Sport>> {
                 String query;
                 if(params.length > 0 )
                 {
-                    query = "select * from [SportsType] WHERE ID = '"+(String)params[0]+"'";
+                    query = "select * from [SportsType] WHERE ID = '"+ params[0]+"'";
                 }
                 else
                 {
