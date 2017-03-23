@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements
         OnFacilitiesDataLoaded,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
+        GoogleMap.OnMarkerClickListener,
         OnMapReadyCallback,
         OnCameraIdleListener {
 
@@ -57,43 +58,61 @@ public class MainActivity extends AppCompatActivity implements
     private dbGetFacilitiesList getFacils;
     private SharedPreferences preferences;
     private Toolbar toolbar;
-
+    private LatLngBounds curBounds;
+    private Marker lastMarkerClicked;
+    final static LatLng WTSC_POS = new LatLng(35.651143,-78.704099);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //  ActionBar actionBar = getSupportActionBar();
-        //  actionBar.setDisplayShowHomeEnabled(true);
-        //   actionBar.setIcon(R.drawable.lets_play_icon5);
 
-        // Find the toolbar view inside the activity layout
+        buildGoogleApiClient();
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(1000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY );
+
         toolbar = (Toolbar) findViewById(R.id.menu_bar );
-        // Sets the Toolbar to act as the ActionBar for this Activity window.
-        // Make sure the toolbar exists in the activity and is not null
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.mipmap.ic_launcher);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
         getSupportActionBar().setLogo(R.drawable.lets_play_icon5);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-   //     toolbar.setNavigationIcon(R.drawable.ic_menu_moreoverflow );
-     //   toolbar.setNavigationContentDescription("more menu");
-       // toolbar.setLogo(R.drawable.lets_play_icon5);
-     //   toolbar.setLogoDescription("LetsPlay");
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
-
         String json = preferences.getString("User", "");
-
         if (json.equals("")) {
             startActivity(new Intent(getApplicationContext(), SignIn.class));
         }
-
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences.Editor prefsEditor = preferences.edit();
+        prefsEditor.putFloat("Location_LAT",(float)mLastLocation.getLatitude());
+        prefsEditor.putFloat("Location_LNG",(float)mLastLocation.getLongitude());
+        prefsEditor.commit();
+    }
+
+        @Override
+    public void onSaveInstanceState(Bundle outState) {
+         outState.putParcelable("lastLocation",mLastLocation);
+         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        if(mLastLocation==null){
+            Location local = savedInstanceState.getParcelable("lastLocation");
+            mLastLocation.set(local);
+        }
+     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -126,31 +145,34 @@ public class MainActivity extends AppCompatActivity implements
     public void onMapReady(GoogleMap map) {
         mMap = map;
         mMap.setOnCameraIdleListener(this);
+        mMap.setOnMarkerClickListener(this);
         map.getUiSettings().setZoomControlsEnabled(true);
-        //       mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);     //change map type
 
-        //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
-                buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
-            } else {
-                LatLng wtscPos = new LatLng(35.651143, -78.704099);
-                map.addMarker(new MarkerOptions().position(wtscPos).title("Wake Tech Software Corp"));
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(wtscPos, 10));
             }
-        } else {
-            buildGoogleApiClient();
-            mMap.setMyLocationEnabled(true);
         }
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(WTSC_POS, 12));
+        map.addMarker(new MarkerOptions().position(WTSC_POS).title("Wake Tech Software Corp"));
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+        lastMarkerClicked = marker;
+        return false;
     }
 
     @Override
     public void onCameraIdle() {
-        // returns current bounds
-        LatLngBounds curBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+        if(lastMarkerClicked != null) {
+            if (lastMarkerClicked.isInfoWindowShown()) {
+                return;
+            }
+        }
+        curBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
         getFacils = new dbGetFacilitiesList(MainActivity.this);
         getFacils.execute(curBounds);
     }
@@ -167,17 +189,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    // Menu icons are inflated just as they were with actionbar
-
-
-
-    //////////////////////////////////////////////////////////////////////////////////
-    /*
-    Methods for zooming in on current location
-    Larson Young, 3/8/17
-     */
-    /////////////////////////////////////////////////////////////////////////////////
-
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -189,26 +200,22 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);      //altered
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            setCurrentLocation(mLastLocation);
         }
-
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     //@Override
@@ -217,7 +224,14 @@ public class MainActivity extends AppCompatActivity implements
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
+        setCurrentLocation(location);
+        //stop location updates
+        if (mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this); //altered
+        }
+    }
 
+    private void setCurrentLocation(Location location){
         //Place current location marker
 
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -227,15 +241,9 @@ public class MainActivity extends AppCompatActivity implements
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         mCurrLocationMarker = mMap.addMarker(markerOptions);
 
-
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
-
-        //stop location updates
-        if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this); //altered
-        }
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
