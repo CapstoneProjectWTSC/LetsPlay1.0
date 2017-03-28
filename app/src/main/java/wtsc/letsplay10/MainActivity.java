@@ -20,9 +20,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraIdleListener;
@@ -46,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnMarkerClickListener,
         OnMapReadyCallback,
-        OnCameraIdleListener {
+        OnCameraIdleListener, PlaceSelectionListener {
 
     // instance of the GetCurrentUser utility functions to get the user data from the database
     private List<Facility> facilitiesList;
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements
     private Toolbar toolbar;
     private LatLngBounds curBounds;
     private Marker lastMarkerClicked;
-    final static LatLng WTSC_POS = new LatLng(35.651143,-78.704099);
+    private final static LatLng WTSC_POS = new LatLng(35.651143, -78.704099);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,14 +75,13 @@ public class MainActivity extends AppCompatActivity implements
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY );
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        toolbar = (Toolbar) findViewById(R.id.menu_bar );
+        toolbar = (Toolbar) findViewById(R.id.menu_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
-        getSupportActionBar().setLogo(R.drawable.lets_play_icon5);
+        getSupportActionBar().setLogo(R.drawable.lets_play_icon6);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
@@ -86,10 +89,37 @@ public class MainActivity extends AppCompatActivity implements
         if (json.equals("")) {
             startActivity(new Intent(getApplicationContext(), SignIn.class));
         }
+
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
+        autocompleteFragment.setOnPlaceSelectedListener(this);
+        autocompleteFragment.setHint("Find Location");
+
+
+
+
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
     }
+
+    @Override
+    public void onPlaceSelected(Place place) {
+        // TODO: Get info about the selected place.
+  //      String s = (String)place.getName();
+        //             Log.i(TAG, "Place: " + place.getName());
+    }
+
+    @Override
+    public void onError(Status status) {
+        // TODO: Handle the error.
+  //      String s = status.toString();
+        //             Log.i(TAG, "An error occurred: " + status);
+    }
+
+
+
 
     @Override
     public void onPause() {
@@ -102,14 +132,17 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
     public void onSaveInstanceState(Bundle outState) {
-         outState.putParcelable("lastLocation",mLastLocation);
+ //        outState.putParcelable("lastLocation",mLastLocation);
          super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         if(mLastLocation==null){
-            Location local = savedInstanceState.getParcelable("lastLocation");
+ //           Location local = savedInstanceState.getParcelable("lastLocation");
+            Location local = new Location("");
+            local.setLatitude(savedInstanceState.getFloat("Location_LAT"));
+            local.setLongitude(savedInstanceState.getFloat("Location_LNG"));
             mLastLocation.set(local);
         }
      }
@@ -194,6 +227,9 @@ public class MainActivity extends AppCompatActivity implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
+//                .addApi(Places.GEO_DATA_API)
+//                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this, 0, this)
                 .build();
         mGoogleApiClient.connect();
     }
@@ -206,16 +242,21 @@ public class MainActivity extends AppCompatActivity implements
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);      //altered
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            setCurrentLocation(mLastLocation);
+            if(mLastLocation != null){
+                setCurrentLocation(mLastLocation);
+            }
+
         }
     }
 
     @Override
     public void onConnectionSuspended(int i) {
+        int a =i;
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        String s = connectionResult.getErrorMessage();
     }
 
     //@Override

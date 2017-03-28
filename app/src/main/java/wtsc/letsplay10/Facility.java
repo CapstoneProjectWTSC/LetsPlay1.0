@@ -8,7 +8,7 @@ public class Facility
    int facilityID;
    double latitude, longitude;
 
-  // public Facility(int facilityID,  )
+   public Facility(){}
    
    public Facility(int facilityID, String name, String address1, String address2, String city,
                    String state, String zip, double latitude, double longitude, String notes)
