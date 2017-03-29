@@ -49,15 +49,17 @@ public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnMarkerClickListener,
+        GoogleMap.OnMapClickListener,
         OnMapReadyCallback,
-        OnCameraIdleListener, PlaceSelectionListener {
+        OnCameraIdleListener,
+        PlaceSelectionListener {
 
-    // instance of the GetCurrentUser utility functions to get the user data from the database
     private List<Facility> facilitiesList;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mLastLocation;
+    private Place selectedPlace;
     private Marker mCurrLocationMarker;
     private dbGetFacilitiesList getFacils;
     private SharedPreferences preferences;
@@ -65,11 +67,16 @@ public class MainActivity extends AppCompatActivity implements
     private LatLngBounds curBounds;
     private Marker lastMarkerClicked;
     private final static LatLng WTSC_POS = new LatLng(35.651143, -78.704099);
+    private int currentZoomLevel;
+    private boolean selectedPlaceMarkerShowing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        currentZoomLevel = 12;
+        selectedPlaceMarkerShowing = false;
 
         buildGoogleApiClient();
         mLocationRequest = new LocationRequest();
@@ -102,19 +109,30 @@ public class MainActivity extends AppCompatActivity implements
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
+
+
     }
 
     @Override
     public void onPlaceSelected(Place place) {
         // TODO: Get info about the selected place.
-  //      String s = (String)place.getName();
+       // String s = (String)place.getName();
+        selectedPlace = place;
+        LatLng selectedLatLng = selectedPlace.getLatLng();
+        Marker selectedMarker = mMap.addMarker(new MarkerOptions()
+                                    .position(selectedLatLng)
+                                    .title(selectedPlace.getName().toString()));
+        selectedMarker.showInfoWindow();;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, currentZoomLevel));
+        selectedPlaceMarkerShowing = true;
+
         //             Log.i(TAG, "Place: " + place.getName());
     }
 
     @Override
     public void onError(Status status) {
         // TODO: Handle the error.
-  //      String s = status.toString();
+
         //             Log.i(TAG, "An error occurred: " + status);
     }
 
@@ -188,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements
                 mMap.setMyLocationEnabled(true);
             }
         }
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(WTSC_POS, 12));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(WTSC_POS, currentZoomLevel));
         map.addMarker(new MarkerOptions().position(WTSC_POS).title("Wake Tech Software Corp"));
     }
 
@@ -206,8 +224,15 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
         curBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        getFacils = new dbGetFacilitiesList(MainActivity.this);
-        getFacils.execute(curBounds);
+        if(!selectedPlaceMarkerShowing) {
+            getFacils = new dbGetFacilitiesList(MainActivity.this);
+            getFacils.execute(curBounds);
+        }
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        selectedPlaceMarkerShowing = false;
     }
 
     @Override
@@ -278,13 +303,13 @@ public class MainActivity extends AppCompatActivity implements
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title("Starting Position");
+        markerOptions.title("My Location");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         mCurrLocationMarker = mMap.addMarker(markerOptions);
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(currentZoomLevel));
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -352,4 +377,6 @@ public class MainActivity extends AppCompatActivity implements
             //You can add here other case statements according to your requirement.
         }
     }
+
+
 }
