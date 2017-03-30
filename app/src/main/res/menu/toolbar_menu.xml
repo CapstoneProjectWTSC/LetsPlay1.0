@@ -3,15 +3,44 @@
 
     <!-- "Mark Favorite", should appear as action button if possible -->
     <item
-        android:id="@+id/action_favorite"
+        android:id="@+id/view_schedules"
         android:icon="@drawable/common_google_signin_btn_text_dark_normal"
-        android:title="@string/action_favorite"
+        android:title="@string/view_schedules"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:showAsAction="never">
+
+        <menu>
+
+            <item android:id="@+id/my_schedules"
+                android:title="@string/my_schedules"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:showAsAction="never"/>
+            <item android:id="@+id/sports_type"
+                android:title="@string/sports_type"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:showAsAction="never"/>
+            <item android:id="@+id/date_n_times"
+                android:title="@string/date_n_times"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:showAsAction="never"/>
+            <item android:id="@+id/view_all"
+                android:title="@string/view_all"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:showAsAction="never"/>
+        </menu>
+
+        </item>
+
+    <!-- Settings, should always be in the overflow -->
+    <item android:id="@+id/add_schedule"
+        android:title="@string/add_schedule"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         app:showAsAction="never"/>
 
     <!-- Settings, should always be in the overflow -->
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+    <item android:id="@+id/add_facility"
+        android:title="@string/add_facility"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         app:showAsAction="never"/>
+
  </menu>

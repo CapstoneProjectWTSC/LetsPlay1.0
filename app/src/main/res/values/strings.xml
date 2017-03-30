@@ -7,6 +7,12 @@
     <string name="confirmButton">Confirm</string>
     <string name="signInButton">Sign In</string>
     <string name="createAccountButton">Don\'t have an account? Create one!</string>
-    <string name="action_favorite">Favorite Action</string>
-    <string name="action_settings">Action Settings</string>
+    <string name="view_schedules">View Schedules</string>
+    <string name="add_schedule">Add Schedule</string>
+    <string name="add_facility">Add Facility</string>
+    <string name="my_schedules">My Schedules</string>
+    <string name="sports_type">Sports Type</string>
+    <string name="date_n_times">Date &amp; Times</string>
+    <string name="view_all">All Schedules</string>
+
 </resources>
