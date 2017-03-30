@@ -93,8 +93,9 @@ public class MainActivity extends AppCompatActivity implements
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
         String json = preferences.getString("User", "");
+   //     json="";
         if (json.equals("")) {
-            startActivity(new Intent(getApplicationContext(), SignIn.class));
+            startActivity(new Intent(getApplicationContext(), SignIn.class ));
         }
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
@@ -145,10 +146,12 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onPause() {
         super.onPause();
-        SharedPreferences.Editor prefsEditor = preferences.edit();
-        prefsEditor.putFloat("Location_LAT",(float)mLastLocation.getLatitude());
-        prefsEditor.putFloat("Location_LNG",(float)mLastLocation.getLongitude());
-        prefsEditor.commit();
+        if(mLastLocation!=null) {
+            SharedPreferences.Editor prefsEditor = preferences.edit();
+            prefsEditor.putFloat("Location_LAT", (float) mLastLocation.getLatitude());
+            prefsEditor.putFloat("Location_LNG", (float) mLastLocation.getLongitude());
+            prefsEditor.commit();
+        }
     }
 
         @Override

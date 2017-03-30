@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -22,6 +21,8 @@ import android.widget.EditText;
 
 import com.google.gson.Gson;
 
+import static wtsc.letsplay10.R.id.signIn;
+
 public class SignIn extends AppCompatActivity implements
         OnClickListener,
         OnKeyListener,
@@ -30,7 +31,8 @@ public class SignIn extends AppCompatActivity implements
 
     private EditText emailField;
     private EditText passwordField;
-    private Button signIn;
+    private Button signInBtn;
+    private Button createAccountBtn;
     private dbValidateUser vUser;
     private String emailFieldString;
     private String passwordFieldString;
@@ -40,24 +42,10 @@ public class SignIn extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main );
-
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setIcon(R.drawable.lets_play_icon5);
-
+        setContentView(R.layout.sign_in );
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
-
         String json = preferences.getString("User", "");
-
-
-        if (!json.equals(""))
-        {
-            Gson gson = new Gson();
-            currentUser = gson.fromJson(json, User.class);
-            startActivity(new Intent(getApplicationContext(), Account.class));
-        }
 
         emailField = (EditText) findViewById(R.id.emailField);
         passwordField = (EditText) findViewById(R.id.passwordField);
@@ -65,9 +53,10 @@ public class SignIn extends AppCompatActivity implements
         emailField.setOnKeyListener(this);
         passwordField.setOnKeyListener(this);
 
-        signIn = (Button) findViewById(R.id.signIn);
-
-        signIn.setOnClickListener(this);
+        signInBtn = (Button) findViewById(signIn);
+        signInBtn.setOnClickListener(this);
+        createAccountBtn = (Button) findViewById(R.id.createAccount);
+        createAccountBtn.setOnClickListener(this);;
     }
 
 
@@ -84,7 +73,7 @@ public class SignIn extends AppCompatActivity implements
                         passwordField.requestFocus();
                         break;
                     case R.id. passwordSubmission:
-                        signIn.requestFocus();
+                        signInBtn.requestFocus();
                         InputMethodManager imm = (InputMethodManager) getSystemService(
                                 INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
@@ -99,11 +88,14 @@ public class SignIn extends AppCompatActivity implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.signIn:
+            case signIn:
                 passwordField.setError(null);
                 emailFieldString = emailField.getText().toString();
                 passwordFieldString= passwordField.getText().toString();
 
+                break;
+            case R.id.createAccount:
+                startActivity(new Intent(getApplicationContext(), Introduction.class ));
                 break;
         }
     }
@@ -125,7 +117,7 @@ public class SignIn extends AppCompatActivity implements
                 message = "Invalid password error";
             }
             else {message = "Invalid email error";}
-            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signIn), message, Snackbar.LENGTH_SHORT);
+            Snackbar invalidLogin = Snackbar.make(findViewById(signIn), message, Snackbar.LENGTH_SHORT);
             invalidLogin.show();
         }
     }

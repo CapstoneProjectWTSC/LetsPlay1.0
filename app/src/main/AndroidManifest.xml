@@ -27,7 +27,7 @@
 
         <activity android:name=".Introduction">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.INTRO" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -43,7 +43,7 @@
 
         <activity android:name=".SignIn">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.SIGNIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
