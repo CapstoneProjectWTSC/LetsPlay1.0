@@ -117,6 +117,9 @@ public class MainActivity extends AppCompatActivity implements
     public void onPlaceSelected(Place place) {
         // TODO: Get info about the selected place.
        // String s = (String)place.getName();
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+//        autocompleteFragment.
         selectedPlace = place;
         LatLng selectedLatLng = selectedPlace.getLatLng();
         Marker selectedMarker = mMap.addMarker(new MarkerOptions()
