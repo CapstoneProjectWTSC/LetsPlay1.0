@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- "Mark Favorite", should appear as action button if possible -->
     <item
         android:id="@+id/view_schedules"
         android:icon="@drawable/common_google_signin_btn_text_dark_normal"
@@ -9,8 +8,8 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         app:showAsAction="never">
 
+<!-- =========================== view menu sub menu =============================-->
         <menu>
-
             <item android:id="@+id/my_schedules"
                 android:title="@string/my_schedules"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -28,16 +27,14 @@
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 app:showAsAction="never"/>
         </menu>
+<!-- =========================== end sub menu ====================================-->
+    </item>
 
-        </item>
-
-    <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/add_schedule"
         android:title="@string/add_schedule"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         app:showAsAction="never"/>
 
-    <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/add_facility"
         android:title="@string/add_facility"
         xmlns:app="http://schemas.android.com/apk/res-auto"

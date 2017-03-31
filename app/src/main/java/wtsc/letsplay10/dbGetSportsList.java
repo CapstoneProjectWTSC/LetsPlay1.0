@@ -51,7 +51,7 @@ public class dbGetSportsList extends AsyncTask<String,String,List<Sport>> {
                 ResultSet rs = stmt.executeQuery(query);
 
                 while (rs.next()){
-                    int id =  rs.getInt("ID");
+                    int id =  rs.getInt("SportsType_ID");
                     String name = rs.getString("Sports_Name");
                     sp.add(new Sport(id,name));
                 }
