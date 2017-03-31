@@ -35,6 +35,8 @@ public class AddFacility extends AppCompatActivity implements
     dbAddNewFacility db_AddNewFacility;
     dbGetFacilitiesList db_GetFacilitiesList;
     private Location myLastLocation;
+    private Boolean addressButtonChecked;
+    private Boolean clButtonChecked;
 
     private EditText FacilityNameText2;     //top one for current location
     private EditText FacilityNameText;      //bottom one for find by address
@@ -92,7 +94,7 @@ public class AddFacility extends AppCompatActivity implements
         String city = addressInformation.get(0).getLocality();
         String state = addressInformation.get(0).getAdminArea();
         String zip = addressInformation.get(0).getPostalCode();
-        String name = addressInformation.get(0).getFeatureName(); // Only if available else return NULL
+        String name = FacilityNameText2.getText().toString();
         String notes = "";
 
         db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
@@ -132,25 +134,29 @@ public class AddFacility extends AppCompatActivity implements
     public void onClick (View v) {
         switch (v.getId())
         {
-            case R.id.clButton:
-                    this.latitude = myLastLocation.getLatitude();
-                    this.longitude = myLastLocation.getLongitude();
-                    try {
-                        findLocationInformation();
-                    } catch (IOException IOE) {
-                        IOE.printStackTrace();
+            case R.id.submitButton:
+
+                    if (clButtonChecked)
+                    {
+                        this.latitude = myLastLocation.getLatitude();
+                        this.longitude = myLastLocation.getLongitude();
+                        try {
+                            findLocationInformation();
+                        } catch (IOException IOE) {
+                            IOE.printStackTrace();
+                        }
                     }
-                break;
-            case R.id.addressButton:
-                this.latitude = myLastLocation.getLatitude();
-                this.longitude = myLastLocation.getLongitude();
-                try{
-                    addLocationInformation();
-                }
-                catch(IOException IOE)
-                {
-                    IOE.printStackTrace();
-                }
+
+                    else if (addressButtonChecked)
+                    {
+                        try {
+                            addLocationInformation();
+                        } catch (IOException IOE) {
+                            IOE.printStackTrace();
+                        }
+                    }
+
+
                 break;
             //case R.id.fromMap:
               //  break;
@@ -164,5 +170,22 @@ public class AddFacility extends AppCompatActivity implements
         Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.submitButton), message, Snackbar.LENGTH_SHORT);
         facilityAddedSnackbar.show();
         startActivity(new Intent(getApplicationContext(),MainActivity.class));
+    }
+
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.clButton:
+                if (checked)
+                    clButtonChecked = true;
+                    break;
+            case R.id.addressButton:
+                if (checked)
+                    addressButtonChecked = true;
+                    break;
+        }
     }
 }
