@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements
     private final static LatLng WTSC_POS = new LatLng(35.651143, -78.704099);
     private int currentZoomLevel;
     private boolean selectedPlaceMarkerShowing;
+    private String markerFiltersType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,16 +175,33 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.view_schedules :
+            case R.id.view_schedules:
                 // User chose the "Settings" item, show the app settings UI...
                 return true;
+//-------------------------------- view menu sub menu ---------------------------------
+            case R.id.my_schedules:
+                 markerFiltersType = "MY_SCHEDULES";
+                 return true;
 
+            case R.id.sports_type:
+                //TODO create select sports type activity
+                return true;
+
+            case R.id.date_n_times:
+                //TODO create select date and time activity
+                return true;
+
+            case R.id.view_all:
+                markerFiltersType = "ALL_SCHEDULES";
+                return  true;
+// --------------------end sub menu -----------------------------------------------------
             case R.id.add_schedule :
+                startActivity(new Intent(getApplicationContext(), AddScheduleActivity.class));
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
                 return true;
 
-            case R.id.add_facility :
+            case R.id.add_facility:
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
                 return true;
