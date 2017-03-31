@@ -1,16 +1,17 @@
 package play.wtsc.com.intro;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import org.apache.commons.validator.routines.EmailValidator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+
+import org.apache.commons.validator.routines.EmailValidator;
 
 public class MainActivity extends AppCompatActivity implements OnClickListener, OnKeyListener{
 
@@ -19,7 +20,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
     private EditText passwordSubmission;
     private EditText passwordConfirmation;
     private Button confirm;
-
     private String emailSubmissionString;
     private String usernameSubmissionString;
     private String passwordSubmissionString;
