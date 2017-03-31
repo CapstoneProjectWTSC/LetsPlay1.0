@@ -15,7 +15,7 @@ import java.sql.Statement;
 public class dbAddNewFacility extends AsyncTask<String,String,Facility> {
 
     private dbConnectionClass connectionClass;
-    private OnNewUserAdded dataLoaded;
+    private OnNewFacilityAdded dataLoaded;
     private Facility newFacility;
     private String queryParam;
 
@@ -74,8 +74,8 @@ public class dbAddNewFacility extends AsyncTask<String,String,Facility> {
 
     }
 
-    @Override
+    //@Override
     protected void onPostExecute(User newUser){
-        dataLoaded.onDBNewUserAdded(newUser);
+        dataLoaded.onDBNewFacilityAdded(newFacility);
     }
 }

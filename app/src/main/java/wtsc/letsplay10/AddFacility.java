@@ -1,9 +1,12 @@
 package wtsc.letsplay10;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -13,6 +16,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 
 import com.google.android.gms.location.LocationListener;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,7 +27,7 @@ import java.util.Locale;
  */
 
 public class AddFacility extends AppCompatActivity implements
-        OnClickListener, LocationListener {
+        OnClickListener, LocationListener, OnNewFacilityAdded {
 
     private Facility newFacility;
     private double latitude;
@@ -151,5 +155,14 @@ public class AddFacility extends AppCompatActivity implements
             //case R.id.fromMap:
               //  break;
         }
+    }
+
+    @Override
+    public void onDBNewFacilityAdded(Facility NewFacility) {
+        String name = NewFacility.getName();
+        String message = "The facility " + name + " successfully added!";
+        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.submitButton), message, Snackbar.LENGTH_SHORT);
+        facilityAddedSnackbar.show();
+        startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }
 }
