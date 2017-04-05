@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/intro_page"
     android:layout_width="match_parent"
@@ -15,18 +16,37 @@
     tools:context="wtsc.letsplay10.Introduction">
 
 
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-    <TableRow>
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/lets_play_icon5" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingTop="15dp"
+            android:text="LetsPlay"
+            android:textSize="30sp" />
+    </TableRow>
+
+    <TableRow android:layout_height="match_parent">
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="30dp"
+            android:layout_height="match_parent"
             android:layout_span="2"
-            android:textSize="16dp"
             android:gravity="center"
             android:lineSpacingMultiplier="1.2"
-            android:text="Please enter your login credentials:" />
+            android:paddingBottom="30dp"
+            android:paddingTop="10dp"
+            android:text="Please enter your login credentials:"
+            android:textSize="16dp" />
     </TableRow>
 
     <TableRow
@@ -70,8 +90,11 @@
             android:id="@+id/passwordField"
             />
     </TableRow>
+
     <TableRow
-        android:paddingTop="100dp" >
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="30dp">
 
         <Button
             android:id="@+id/signIn"

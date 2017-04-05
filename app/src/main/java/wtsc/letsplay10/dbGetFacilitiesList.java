@@ -52,11 +52,12 @@ public class dbGetFacilitiesList extends AsyncTask<LatLngBounds,String,List<Faci
                             "on f.[facility_ID] = s.[Facility_ID]"+
                             " WHERE "+
                             "[Lat] > " + sw.latitude + " AND [Lat] < " + ne.latitude + " AND " +
-                            "[Lng] > " + sw.longitude + " AND [Lng] < " + ne.longitude;
+                            "[Lng] > " + sw.longitude + " AND [Lng] < " + ne.longitude +
+                            " ORDER BY f.[Name]";
                 }
                 else
                 {
-                    query = "select * from [Facility]";
+                    query = "select * from [Facility] ORDER BY [Name]";
                 }
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(query);

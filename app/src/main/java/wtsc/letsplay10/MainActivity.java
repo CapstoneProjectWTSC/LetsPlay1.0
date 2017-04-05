@@ -94,10 +94,12 @@ public class MainActivity extends AppCompatActivity implements
 
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
         String json = preferences.getString("User", "");
-   //     json="";
+      //  json="";
         if (json.equals("")) {
             startActivity(new Intent(getApplicationContext(), SignIn.class ));
         }
+
+
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -196,7 +198,9 @@ public class MainActivity extends AppCompatActivity implements
                 return  true;
 // --------------------end sub menu -----------------------------------------------------
             case R.id.add_schedule :
-                startActivity(new Intent(getApplicationContext(), AddScheduleActivity.class));
+                Intent addSchIntent = new Intent(getApplicationContext(), AddScheduleActivity.class);
+                addSchIntent.putExtra("LAST_LOCATION",mLastLocation);
+                startActivity(addSchIntent);
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
                 return true;

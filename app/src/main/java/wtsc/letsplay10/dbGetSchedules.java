@@ -57,11 +57,10 @@ public class dbGetSchedules extends AsyncTask<String,String,List<Schedule>> {
 
                 while (rs.next()) {
                     sh = new Schedule();
-                    sh.setScheduleID(rs.getInt("ID"));
-                    sh.setSportID(rs.getInt("FK_SportsTypeID"));
-                    sh.setFacilityID(rs.getInt("FK_FacilityID"));
-                    sh.setScheduleDate(rs.getDate("ScheduleDate"));
-                    sh.setScheduleTime(rs.getTime("ScheduleTime"));
+                    sh.setScheduleID(rs.getInt("Schedule_ID"));
+                    sh.setSportID(rs.getInt("SportsType_ID"));
+                    sh.setFacilityID(rs.getInt("Facility_ID"));
+                    sh.setScheduleDateTime(rs.getDate("Schedule_DateTime"));
                     sl.add(sh);
                 }
 

@@ -3,6 +3,12 @@ package wtsc.letsplay10;
 public class UserSchedule
 {
 	int userScheduleID, userID, scheduleID;
+
+	public UserSchedule(UserSchedule userSchedule){
+        setUserScheduleID(userSchedule.getUserScheduleID());
+        setUserID(userSchedule.getUserID());
+        setScheduleID(userSchedule.getScheduleID());
+    }
 	
 	public UserSchedule(int userScheduleID, int userID, int scheduleID)
 	{
@@ -10,6 +16,8 @@ public class UserSchedule
 		setUserID(userID);
 		setScheduleID(scheduleID);
 	}
+
+	public UserSchedule(){}
 	
 	public int getUserScheduleID()
 	{

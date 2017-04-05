@@ -3,22 +3,26 @@ package wtsc.letsplay10;
 
 //import net.sourceforge.jtds.jdbc.DateTime;
 
-import java.sql.Date;
-import java.sql.Time;
+
+import java.util.Date;
 
 public class Schedule
 {
 	private int scheduleID, facilityID, sportsTypeID;
-	private Date scheduleDate;
-    private Time scheduleTime;
+	private Date scheduleDateTime;
 
-	public Schedule(int scheduleID, int facilityID, int sportsTypeID, Date scheduleDate, Time scheduleTime)
+	public Schedule (Schedule schedule){
+		setScheduleID(schedule.getScheduleID());
+		setFacilityID(schedule.getFacilityID());
+		setSportID(schedule.getSportID());
+		setScheduleDateTime(schedule.getScheduleDateTime());
+	}
+
+	public Schedule( int facilityID, int sportsTypeID, Date scheduleDateTime)
 	{
-		setScheduleID(scheduleID);
 		setFacilityID(facilityID);
 		setSportID(sportsTypeID);
-		setScheduleDate(scheduleDate);
-        setScheduleTime(scheduleTime);
+		setScheduleDateTime(scheduleDateTime);
 	}
 
 	public Schedule(){}
@@ -53,15 +57,11 @@ public class Schedule
 		this.sportsTypeID = sportID;
 	}
 	
-	public Date getScheduleDate()
+	public Date getScheduleDateTime()
 	{
-		return this.scheduleDate;
+		return this.scheduleDateTime;
 	}
 	
-	public void setScheduleDate(Date scheduleDate){this.scheduleDate = scheduleDate;}
+	public void setScheduleDateTime(Date scheduleDateTime){this.scheduleDateTime = scheduleDateTime;}
 
-    public Time getScheduleTime() { return this.scheduleTime;}
-
-    public void setScheduleTime(Time scheduleTime){this.scheduleTime = scheduleTime;}
-	
 }

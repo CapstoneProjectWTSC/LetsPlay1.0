@@ -15,6 +15,7 @@
     tools:context="wtsc.letsplay10.Introduction">
 
 
+
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -56,6 +57,7 @@
             android:hint="@string/lastEntryText"
             android:imeOptions="actionNext"
             android:maxLines="1" />
+
     </TableRow>
 
     <TableRow
@@ -118,6 +120,7 @@
             android:hint="@string/passwordConfirmationText"
             android:imeOptions="actionNext"
             android:maxLines="1" />
+
     </TableRow>
 
     <TableRow
@@ -131,6 +134,9 @@
             android:layout_height="wrap_content"
             android:layout_span="2"
             android:text="@string/confirmButton" />
-    </TableRow>
+   </TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </TableLayout>
 

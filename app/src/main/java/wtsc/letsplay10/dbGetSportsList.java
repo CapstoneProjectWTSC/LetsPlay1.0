@@ -41,11 +41,11 @@ public class dbGetSportsList extends AsyncTask<String,String,List<Sport>> {
                 String query;
                 if(params.length > 0 )
                 {
-                    query = "select * from [SportsType] WHERE ID = '"+ params[0]+"'";
+                    query = "select * from [SportsType] WHERE ID = '"+ params[0]+"' ORDER BY [Sports_Name]";
                 }
                 else
                 {
-                    query = "select * from [SportsType]";
+                    query = "select * from [SportsType] ORDER BY [Sports_Name]";
                 }
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
