@@ -89,8 +89,9 @@ public class dbAddNewFacility extends AsyncTask<String,String,Facility> {
         return newFacility;
 
     }
-    @Override
-    protected void onPostExecute(Facility facility){
-        dataLoaded.onNewFacilityAdded(newFacility);
+
+    //@Override
+    protected void onPostExecute(User newUser){
+        dataLoaded.onDBNewFacilityAdded(newFacility);
     }
 }

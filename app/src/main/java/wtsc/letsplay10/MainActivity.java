@@ -208,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.add_facility:
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
+                startActivity(new Intent(getApplicationContext(), AddFacility.class));
                 return true;
 
             default:

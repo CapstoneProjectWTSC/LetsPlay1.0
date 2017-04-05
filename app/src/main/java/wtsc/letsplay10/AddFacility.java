@@ -1,24 +1,47 @@
 package wtsc.letsplay10;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Bundle;
+import android.support.annotation.IdRes;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+=======
+import android.view.View;
+>>>>>>> Temporary merge branch 2
 /**
  * Created by a1995 on 3/20/2017.
  */
 
 public class AddFacility extends AppCompatActivity implements
-        OnClickListener, LocationListener {
+        OnClickListener, LocationListener, OnNewFacilityAdded, OnCheckedChangeListener {
 
     private Facility newFacility;
     private double latitude;
@@ -26,40 +49,57 @@ public class AddFacility extends AppCompatActivity implements
     dbAddNewFacility db_AddNewFacility;
     dbGetFacilitiesList db_GetFacilitiesList;
     private Location myLastLocation;
+    private Boolean addressButtonChecked;
+    private Boolean clButtonChecked;
 
-    public void onKey(View view, int keyCode, KeyEvent event){}
+    private EditText FacilityNameText2;     //top one for current location
+    private EditText FacilityNameText;      //bottom one for find by address
+    private EditText AddressText;
+    private EditText CityText;
+    private EditText StateText;
+    private EditText ZipText;
 
-    public void onClick (View v) {
- //       switch (v.getId()) {
- //           case R.id.myLocation:
- //               this.latitude = myLastLocation.getLatitude();
- //               this.longitude = myLastLocation.getLongitude();
- //               try{
- //                   findLocationInformation();
- //               }
- //               catch(IOException IOE)
-//                {
- //                   IOE.printStackTrace();
- //               }
- //               break;
- //           case R.id.viewAll:
- //               //<code></code>
- //               break;
- //           case R.id.fromMap:
+    private RadioButton clButton;           //current location radio button
+    private RadioButton addressButton;      //find by address button
+    private RadioGroup rBGroup;
+    private Button createFacilityButton;    //button at bottom to create facility
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.add_facility);
 
- //               break;
+        //preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
+        //String json = preferences.getString("User", "");
 
- //       }
+        FacilityNameText2 = (EditText) findViewById(R.id.FacilityNameText2);
+        FacilityNameText = (EditText) findViewById(R.id.FacilityNameText);
+        AddressText = (EditText) findViewById(R.id.AddressText);
+        CityText = (EditText) findViewById(R.id.CityText);
+        StateText = (EditText) findViewById(R.id.StateText);
+        ZipText = (EditText) findViewById(R.id.ZipText);
+
+        rBGroup = (RadioGroup) findViewById(R.id.RGroup);
+        rBGroup.setOnCheckedChangeListener(this);
+
+        clButton = (RadioButton) findViewById(R.id.clButton);
+
+        addressButton = (RadioButton) findViewById(R.id.addressButton);
+
+        createFacilityButton = (Button) findViewById(R.id.submitButton);
+        createFacilityButton.setOnClickListener(this);
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location)
+    {
         myLastLocation = location;
+
     }
 
-    public void findLocationInformation() throws IOException
-    {
+    //run this if user selects to add facility based on current location
+
+    public void findLocationInformation() throws IOException {
         Geocoder geocoder;
         List<Address> addressInformation;
         geocoder = new Geocoder(this, Locale.getDefault());
@@ -70,12 +110,97 @@ public class AddFacility extends AppCompatActivity implements
         String city = addressInformation.get(0).getLocality();
         String state = addressInformation.get(0).getAdminArea();
         String zip = addressInformation.get(0).getPostalCode();
-        String name = addressInformation.get(0).getFeatureName(); // Only if available else return NULL
+        String name = FacilityNameText2.getText().toString();
         String notes = "";
 
-//        db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
+        db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
 
         newFacility = db_AddNewFacility.doInBackground(name + address + city + state + zip + Double.toString(latitude)
                 + Double.toString(longitude) + notes);
+
+    }
+
+
+    //run this if add by address is selected.  Adds info using data gathered from user
+
+    public void addLocationInformation() throws IOException {
+
+        String address = AddressText.getText().toString();
+        String city = CityText.getText().toString();
+        String state = StateText.getText().toString();
+        String zip = ZipText.getText().toString();
+        String name = FacilityNameText.getText().toString();
+        String notes = "";
+
+        db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
+
+        newFacility = db_AddNewFacility.doInBackground(name + address + city + state + zip + Double.toString(latitude)
+                + Double.toString(longitude) + notes);
+
+    }
+
+
+    public void onKey(View view, int keyCode, KeyEvent event){}
+
+    /*              //could possibly add something like this to disable button until user enters something into field.
+                    if(FacilityNameText2.length() > 0) //if user has entered something in the fields, the function will work
+                {
+     */
+
+    public void onClick (View v) {
+        int selectedId = rBGroup.getCheckedRadioButtonId();
+
+        switch (v.getId())
+        {
+            case R.id.submitButton:
+
+                    if (selectedId == R.id.clButton)
+                    {
+                        this.latitude = myLastLocation.getLatitude();
+                        this.longitude = myLastLocation.getLongitude();
+                        try {
+                            findLocationInformation();
+                        } catch (IOException IOE) {
+                            IOE.printStackTrace();
+                        }
+                    }
+
+                    else if (selectedId == R.id.addressButton)
+                    {
+                        try {
+                            addLocationInformation();
+                        } catch (IOException IOE) {
+                            IOE.printStackTrace();
+                        }
+                    }
+
+
+                break;
+            //case R.id.fromMap:
+              //  break;
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+        if (checkedId == R.id.clButton)
+        {
+            Toast.makeText(getApplicationContext(), "Use current location",
+                    Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), "Enter in an address",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onDBNewFacilityAdded(Facility NewFacility) {
+        String name = NewFacility.getName();
+        String message = "The facility " + name + " successfully added!";
+        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.submitButton), message, Snackbar.LENGTH_SHORT);
+        facilityAddedSnackbar.show();
+        startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }
 }
