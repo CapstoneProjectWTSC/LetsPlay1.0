@@ -34,17 +34,16 @@
         android:text="Choose how you'd like to add a facility."
         android:textSize="20dp" />
 </TableRow>
-
-    <TableRow>
-
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/RGroup"
+        android:checkedButton="@+id/clButton" >
         <RadioButton
             android:id="@+id/clButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add By Current Location" />
-
-    </TableRow>
-    <TableRow>
 
         <EditText
             android:id="@+id/FacilityNameText2"
@@ -54,7 +53,6 @@
             android:hint="Facility Name"
             android:inputType="textPersonName"
             android:paddingTop="10dp" />
-    </TableRow>
 <!--
     <TableRow>
 
@@ -82,8 +80,6 @@
     <TextView
          />
          -->
-
-    <TableRow>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -92,16 +88,14 @@
             android:gravity="center"
             android:text="Or"
             android:textSize="20dp" />
-    </TableRow>
-    <TableRow>
+
 
         <RadioButton
             android:id="@+id/addressButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add By Address" />
-
-    </TableRow>
+</RadioGroup>
     <TextView
  />
     <TableRow>

@@ -6,6 +6,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -14,6 +15,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.gson.Gson;
@@ -27,7 +31,7 @@ import java.util.Locale;
  */
 
 public class AddFacility extends AppCompatActivity implements
-        OnClickListener, LocationListener, OnNewFacilityAdded {
+        OnClickListener, LocationListener, OnNewFacilityAdded, OnCheckedChangeListener {
 
     private Facility newFacility;
     private double latitude;
@@ -47,6 +51,7 @@ public class AddFacility extends AppCompatActivity implements
 
     private RadioButton clButton;           //current location radio button
     private RadioButton addressButton;      //find by address button
+    private RadioGroup rBGroup;
     private Button createFacilityButton;    //button at bottom to create facility
 
     @Override
@@ -64,11 +69,12 @@ public class AddFacility extends AppCompatActivity implements
         StateText = (EditText) findViewById(R.id.StateText);
         ZipText = (EditText) findViewById(R.id.ZipText);
 
+        rBGroup = (RadioGroup) findViewById(R.id.RGroup);
+        rBGroup.setOnCheckedChangeListener(this);
+
         clButton = (RadioButton) findViewById(R.id.clButton);
-        clButton.setOnClickListener(this);
 
         addressButton = (RadioButton) findViewById(R.id.addressButton);
-        addressButton.setOnClickListener(this);
 
         createFacilityButton = (Button) findViewById(R.id.submitButton);
         createFacilityButton.setOnClickListener(this);
@@ -132,11 +138,13 @@ public class AddFacility extends AppCompatActivity implements
      */
 
     public void onClick (View v) {
+        int selectedId = rBGroup.getCheckedRadioButtonId();
+
         switch (v.getId())
         {
             case R.id.submitButton:
 
-                    if (clButtonChecked)
+                    if (selectedId == R.id.clButton)
                     {
                         this.latitude = myLastLocation.getLatitude();
                         this.longitude = myLastLocation.getLongitude();
@@ -147,7 +155,7 @@ public class AddFacility extends AppCompatActivity implements
                         }
                     }
 
-                    else if (addressButtonChecked)
+                    else if (selectedId == R.id.addressButton)
                     {
                         try {
                             addLocationInformation();
@@ -164,28 +172,25 @@ public class AddFacility extends AppCompatActivity implements
     }
 
     @Override
+    public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+        if (checkedId == R.id.clButton)
+        {
+            Toast.makeText(getApplicationContext(), "Use current location",
+                    Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), "Enter in an address",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
     public void onDBNewFacilityAdded(Facility NewFacility) {
         String name = NewFacility.getName();
         String message = "The facility " + name + " successfully added!";
         Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.submitButton), message, Snackbar.LENGTH_SHORT);
         facilityAddedSnackbar.show();
         startActivity(new Intent(getApplicationContext(),MainActivity.class));
-    }
-
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-
-        // Check which radio button was clicked
-        switch(view.getId()) {
-            case R.id.clButton:
-                if (checked)
-                    clButtonChecked = true;
-                    break;
-            case R.id.addressButton:
-                if (checked)
-                    addressButtonChecked = true;
-                    break;
-        }
     }
 }
