@@ -15,7 +15,7 @@ import java.sql.Statement;
 public class dbAddNewFacility extends AsyncTask<String,String,Facility> {
 
     private dbConnectionClass connectionClass;
-    private OnNewUserAdded dataLoaded;
+    private OnNewFacilityAdded dataLoaded;
     private Facility newFacility;
     private String queryParam;
 
