@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">LetsPlay1.0</string>
-    <string name="emailEntryText">E-mail</string>
-    <string name="usernameEntryText">Username</string>
-    <string name="passwordEntryText">Password</string>
-    <string name="passwordConfirmationText">Confirm Password</string>
+    <string name="emailEntryText">E-mail:</string>
+    <string name="usernameEntryText">Username:</string>
+    <string name="passwordEntryText">Password:</string>
+    <string name="passwordConfirmationText">Confirm Password:</string>
     <string name="confirmButton">Confirm</string>
     <string name="signInButton">Sign In</string>
     <string name="createAccountButton">Don\'t have an account? Create one!</string>
@@ -12,4 +12,12 @@
     <string name="firstEntryText">First Name</string>
     <string name="lastEntryText">Last Name</string>
     <string name="intro">Let\'s get you started! First, we just need a bit of info to get you registered...</string>
+    <string name="view_schedules">View Schedules</string>
+    <string name="add_schedule">Add Schedule</string>
+    <string name="add_facility">Add Facility</string>
+    <string name="my_schedules">My Schedules</string>
+    <string name="sports_type">Sports Type</string>
+    <string name="date_n_times">Date &amp; Times</string>
+    <string name="view_all">All Schedules</string>
+
 </resources>
