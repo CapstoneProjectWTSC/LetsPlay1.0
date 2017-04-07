@@ -62,6 +62,7 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
             android:maxLines="1"
             android:imeOptions="actionNext"
             android:id="@+id/emailField"
@@ -84,6 +85,7 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:inputType="textPassword"
             android:paddingTop="50dp"
             android:maxLines="1"
             android:imeOptions="actionNext"
