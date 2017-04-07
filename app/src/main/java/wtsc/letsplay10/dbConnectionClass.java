@@ -13,10 +13,10 @@ import java.sql.SQLException;
  */
 
 public class dbConnectionClass {
-    String ip = "wtsc.database.windows.net";        // connection variables
+    String ip = "s14.winhost.com";        // connection variables
     String className = "net.sourceforge.jtds.jdbc.Driver";
-    String db = "LetsPlay";
-    String un = "WakeTechSC@wtsc";                  // user name
+    String db = "DB_112602_letsplay";
+    String un = "DB_112602_letsplay_user";                  // user name
     String password = "Capstone1";                  // password
 
 
