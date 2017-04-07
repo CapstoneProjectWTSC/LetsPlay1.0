@@ -36,6 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
+            android:inputType="textEmailAddress"
             android:imeOptions="actionNext"
             android:id="@+id/emailSubmission"
             />
@@ -53,6 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
+            android:inputType="textPersonName"
             android:imeOptions="actionNext"
             android:id="@+id/usernameSubmission"
             />
@@ -71,6 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
+            android:inputType="textPassword"
             android:imeOptions="actionNext"
             android:id="@+id/passwordSubmission"
             />
@@ -89,6 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
+            android:inputType="textPassword"
             android:imeOptions="actionNext"
             android:id="@+id/passwordConfirmation"
             />
