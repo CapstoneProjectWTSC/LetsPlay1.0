@@ -35,34 +35,21 @@ public class dbAddNewFacility extends AsyncTask<String,String,Facility> {
             if (con != null){
                 String query;
 
-                if (params.length == 6) {
-                    query = "INSERT INTO [Facility] ([First_Name],[Last_Name],[GameName],[Password],[Email])" +
-                            "  VALUES ('" + params[0] + "','" + params[1] + "','" + params[2] + "','" + params[3] + "','" + params[4] + "','" + params[5] + "','" + params[6] +
-                            "','" + params[7] + "')";
-                    newFacility = new Facility();
-                    newFacility.setName(params[0]);
-                    newFacility.setAddress1(params[1]);
-                    newFacility.setCity(params[2]);
-                    newFacility.setState(params[3]);
-                    newFacility.setZip(params[4]);
-                    newFacility.setLatitude(Long.parseLong(params[5]));
-                    newFacility.setLongitude(Long.parseLong(params[6]));
-                    newFacility.setNotes(params[7]);
-                    query = "INSERT INTO [Facility] ([Name],[Address1],[Address2],[City],[State]" +
-                            ",[Zip],[Lat],[Lng],[Notes])" +
-                            "  VALUES ('" + params[0] + "','" + params[1] + "','" + params[2] + "','" +
-                            params[3] + "','" + params[4] + "','" + params[5] + "','" + params[6] +
+                if (params.length == 9) {
+                    query = "INSERT INTO [Facility] ([Name],[Address1],[Address2],"+
+                            "[City],[State],[Zip],[Lat],[Lng],[Notes])" +
+                            "  VALUES ('" + params[0] + "','" + params[1] + "','" + params[2] + "','"
+                            + params[3] + "','" + params[4] + "','" + params[5] + "','" + params[6] +
                             "','" + params[7] + "','" + params[8] + "')";
-
                     newFacility = new Facility();
                     newFacility.setName(params[0]);
                     newFacility.setAddress1(params[1]);
-                    newFacility.setAddress1(params[2]);
+                    newFacility.setAddress2(params[2]);
                     newFacility.setCity(params[3]);
                     newFacility.setState(params[4]);
                     newFacility.setZip(params[5]);
-                    newFacility.setLatitude(Long.parseLong(params[6]));
-                    newFacility.setLongitude(Long.parseLong(params[7]));
+                    newFacility.setLatitude(Double.parseDouble(params[6]));
+                    newFacility.setLongitude(Double.parseDouble(params[7]));
                     newFacility.setNotes(params[8]);
 
                     Statement stmt = con.createStatement();
@@ -85,13 +72,11 @@ public class dbAddNewFacility extends AsyncTask<String,String,Facility> {
         {
             Log.e("ERROR", ex.getMessage());
         }
-
         return newFacility;
-
     }
 
     //@Override
-    protected void onPostExecute(User newUser){
+    protected void onPostExecute(Facility newFacility){
         dataLoaded.onDBNewFacilityAdded(newFacility);
     }
 }

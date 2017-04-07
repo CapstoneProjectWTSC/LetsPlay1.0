@@ -1,7 +1,6 @@
 package wtsc.letsplay10;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -17,25 +16,16 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.Gson;
-=======
-import android.view.View;
->>>>>>> Temporary merge branch 2
+
 /**
  * Created by a1995 on 3/20/2017.
  */
@@ -48,7 +38,7 @@ public class AddFacility extends AppCompatActivity implements
     private double longitude;
     dbAddNewFacility db_AddNewFacility;
     dbGetFacilitiesList db_GetFacilitiesList;
-    private Location myLastLocation;
+    private Location mLastLocation;
     private Boolean addressButtonChecked;
     private Boolean clButtonChecked;
 
@@ -71,6 +61,10 @@ public class AddFacility extends AppCompatActivity implements
 
         //preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
         //String json = preferences.getString("User", "");
+        Intent intent = getIntent();
+        mLastLocation = intent.getParcelableExtra("LAST_LOCATION");
+        TextView tv = (TextView)findViewById(R.id.currentLocationTxt);
+        tv.setText("Lat: "+String.valueOf(mLastLocation.getLatitude())+"  Lng: "+ String.valueOf(mLastLocation.getLongitude()));
 
         FacilityNameText2 = (EditText) findViewById(R.id.FacilityNameText2);
         FacilityNameText = (EditText) findViewById(R.id.FacilityNameText);
@@ -93,7 +87,7 @@ public class AddFacility extends AppCompatActivity implements
     @Override
     public void onLocationChanged(Location location)
     {
-        myLastLocation = location;
+        mLastLocation = location;
 
     }
 
@@ -106,7 +100,8 @@ public class AddFacility extends AppCompatActivity implements
 
         addressInformation = geocoder.getFromLocation(this.latitude, this.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
 
-        String address = addressInformation.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+        String address1 = addressInformation.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+        String address2 = "";
         String city = addressInformation.get(0).getLocality();
         String state = addressInformation.get(0).getAdminArea();
         String zip = addressInformation.get(0).getPostalCode();
@@ -115,8 +110,8 @@ public class AddFacility extends AppCompatActivity implements
 
         db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
 
-        newFacility = db_AddNewFacility.doInBackground(name + address + city + state + zip + Double.toString(latitude)
-                + Double.toString(longitude) + notes);
+        db_AddNewFacility.execute(name, address1, address2,city, state, zip, Double.toString(latitude),
+                Double.toString(longitude), notes);
 
     }
 
@@ -125,7 +120,8 @@ public class AddFacility extends AppCompatActivity implements
 
     public void addLocationInformation() throws IOException {
 
-        String address = AddressText.getText().toString();
+        String address1 = AddressText.getText().toString();
+        String address2 = "";
         String city = CityText.getText().toString();
         String state = StateText.getText().toString();
         String zip = ZipText.getText().toString();
@@ -134,8 +130,9 @@ public class AddFacility extends AppCompatActivity implements
 
         db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
 
-        newFacility = db_AddNewFacility.doInBackground(name + address + city + state + zip + Double.toString(latitude)
-                + Double.toString(longitude) + notes);
+        db_AddNewFacility.execute(name, address1, address2,city, state, zip, Double.toString(latitude),
+                 Double.toString(longitude), notes);
+
 
     }
 
@@ -156,8 +153,8 @@ public class AddFacility extends AppCompatActivity implements
 
                     if (selectedId == R.id.clButton)
                     {
-                        this.latitude = myLastLocation.getLatitude();
-                        this.longitude = myLastLocation.getLongitude();
+                        this.latitude = mLastLocation.getLatitude();
+                        this.longitude = mLastLocation.getLongitude();
                         try {
                             findLocationInformation();
                         } catch (IOException IOE) {
