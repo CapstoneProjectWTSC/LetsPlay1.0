@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements
     private boolean selectedPlaceMarkerShowing;
     private String markerFiltersType;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -251,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements
         lastMarkerClicked = marker;
         return false;
     }
-
+//==================================================================================================================
     @Override
     public void onCameraIdle() {
         if(lastMarkerClicked != null) {
@@ -265,13 +266,14 @@ public class MainActivity extends AppCompatActivity implements
             getFacils.execute(curBounds);
         }
     }
-
+//==================================================================================================================
     @Override
     public void onMapClick(LatLng latLng) {
         selectedPlaceMarkerShowing = false;
     }
 
     @Override
+
     public void onFacilitiesDataLoaded(List<Facility> facilities) {
         facilitiesList = facilities;
         if (facilities.size() > 0) {
