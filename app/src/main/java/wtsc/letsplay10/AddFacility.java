@@ -103,7 +103,8 @@ public class AddFacility extends AppCompatActivity implements
         String address1 = addressInformation.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
         String address2 = "";
         String city = addressInformation.get(0).getLocality();
-        String state = addressInformation.get(0).getAdminArea();
+        String[] spState = addressInformation.get(0).getAddressLine(1).split(" ");
+        String state = spState[1];
         String zip = addressInformation.get(0).getPostalCode();
         String name = FacilityNameText2.getText().toString();
         String notes = "";
