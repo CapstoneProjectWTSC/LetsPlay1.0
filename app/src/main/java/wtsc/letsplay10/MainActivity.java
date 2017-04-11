@@ -37,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -52,7 +53,8 @@ public class MainActivity extends AppCompatActivity implements
         GoogleMap.OnMapClickListener,
         OnMapReadyCallback,
         OnCameraIdleListener,
-        PlaceSelectionListener {
+        PlaceSelectionListener,
+        OnScheduleDataLoaded{
 
     private List<Facility> facilitiesList;
     private GoogleMap mMap;
@@ -62,14 +64,17 @@ public class MainActivity extends AppCompatActivity implements
     private Place selectedPlace;
     private Marker mCurrLocationMarker;
     private dbGetFacilitiesList getFacils;
+//    private dbGetAllSchedules allSchedules;
     private SharedPreferences preferences;
     private Toolbar toolbar;
     private LatLngBounds curBounds;
     private Marker lastMarkerClicked;
+    private List<Marker> showMarkersList;
     private final static LatLng WTSC_POS = new LatLng(35.651143, -78.704099);
     private int currentZoomLevel;
     private boolean selectedPlaceMarkerShowing;
     private String markerFiltersType;
+    private User currentUser;
 
 
     @Override
@@ -93,12 +98,16 @@ public class MainActivity extends AppCompatActivity implements
         getSupportActionBar().setLogo(R.drawable.lets_play_icon6);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        markerFiltersType = "MY_SCHEDULES";
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
         String json = preferences.getString("User", "");
       //  json="";
         if (json.equals("")) {
             startActivity(new Intent(getApplicationContext(), SignIn.class ));
         }
+        currentUser = new User();
+        Gson gson = new Gson();
+        currentUser = gson.fromJson(json, User.class);
 
 
 
@@ -184,20 +193,31 @@ public class MainActivity extends AppCompatActivity implements
 //-------------------------------- view menu sub menu ---------------------------------
             case R.id.my_schedules:
                  markerFiltersType = "MY_SCHEDULES";
+                 onCameraIdle();
                  return true;
 
             case R.id.sports_type:
                 //TODO create select sports type activity
+                if(markerFiltersType == "DATE_TIME"){
+                    markerFiltersType = "DATE_TIME_SPORTS_TYPE";
+                }else { markerFiltersType = "SPORTS_TYPE";}
+                onCameraIdle();
                 return true;
 
             case R.id.date_n_times:
                 //TODO create select date and time activity
+                if(markerFiltersType == "SPORTS_TYPE"){
+                    markerFiltersType = "DATE_TIME_SPORTS_TYPE";
+                }else { markerFiltersType = "DATE_TIME";}
+                onCameraIdle();
                 return true;
 
             case R.id.view_all:
                 markerFiltersType = "ALL_SCHEDULES";
+                onCameraIdle();
                 return  true;
 // --------------------end sub menu -----------------------------------------------------
+
             case R.id.add_schedule :
                 Intent addSchIntent = new Intent(getApplicationContext(), AddScheduleActivity.class);
                 addSchIntent.putExtra("LAST_LOCATION",mLastLocation);
@@ -262,10 +282,38 @@ public class MainActivity extends AppCompatActivity implements
         }
         curBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
         if(!selectedPlaceMarkerShowing) {
+            switch (markerFiltersType){
+                case "MY_SCHEDULES":
+                    dbGetMySchedulesMarkers mySchedules = new dbGetMySchedulesMarkers(MainActivity.this);
+                    mySchedules.execute(new UserBounds(currentUser,curBounds));
+                    break;
+                case "ALL_SCHEDULES":
+
+                    break;
+                case "DATE_TIME":
+
+                    break;
+                case "SPORTS_TYPE":
+
+                    break;
+                case "DATE_TIME_SPORTS_TYPE":
+
+                    break;
+                default:
+
+                    break;
+
+            }
             getFacils = new dbGetFacilitiesList(MainActivity.this);
             getFacils.execute(curBounds);
         }
     }
+
+    @Override
+    public void onScheduleDataLoaded(List<MarkerOptions> schedules) {
+
+    }
+
 //==================================================================================================================
     @Override
     public void onMapClick(LatLng latLng) {
@@ -415,6 +463,7 @@ public class MainActivity extends AppCompatActivity implements
             //You can add here other case statements according to your requirement.
         }
     }
+
 
 
 }
