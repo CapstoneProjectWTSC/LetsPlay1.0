@@ -1,5 +1,7 @@
 package wtsc.letsplay10;
 
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.util.List;
 
 /**
@@ -7,5 +9,5 @@ import java.util.List;
  */
 
 public interface OnScheduleDataLoaded {
-    void onScheduleDataLoaded(List<Schedule> schedules);
+    void onScheduleDataLoaded(List<MarkerOptions> markerOptionsList);
 }
