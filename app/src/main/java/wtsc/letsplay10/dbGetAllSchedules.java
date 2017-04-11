@@ -55,12 +55,14 @@ public class dbGetAllSchedules extends AsyncTask<UserBounds,String,List<MarkerOp
                     LatLng sw = params[0].getBounds().southwest;
                     LatLng ne = params[0].getBounds().northeast;
 
-                    query = "select f.[facility_ID], f.[Name] AS fName, f.Lat, f.Lng, f.[Address1],f.[Address2]" +
-                            ",f.[City],f.[State],f.[Zip],f.[Lat],f.[Lng],f.[Notes]" +
-                            ",s.[schedule_ID]" +
-                            " from [facility] f join [schedule] s " + "" +
-                            "on f.[facility_ID] = s.[Facility_ID]" +
-                            " WHERE " +
+                    query = "select f.[facility_ID], f.[Name] AS fName, f.Lat, f.Lng, f.[Address1],f.[Address2]"+
+                            ",f.[City],f.[State],f.[Zip],f.[Lat],f.[Lng],f.[Notes],s.[schedule_ID], "+
+                            "t.[Sports_Name],t.[Sports_Icon] "+
+                            "FROM [schedule] s "+
+                            "JOIN facility as f on f.Facility_ID = s.Facility_ID "+
+                            "JOIN SportsType as t on t.SportsType_ID = s.SportsType_ID "+
+                            "JOIN UserSchedule as u on u.Schedule_ID = s.Schedule_ID "+
+                            "WHERE "+
                             "[Lat] > " + sw.latitude + " AND [Lat] < " + ne.latitude + " AND " +
                             "[Lng] > " + sw.longitude + " AND [Lng] < " + ne.longitude +
                             " ORDER BY f.[Name]";
@@ -73,21 +75,20 @@ public class dbGetAllSchedules extends AsyncTask<UserBounds,String,List<MarkerOp
                 MarkerOptions mo;
 
                 while (rs.next()) {
-                    String n = rs.getString("fName") + rs.getString("Sports_Name");
-                    LatLng LL = new LatLng(rs.getDouble("Lat"), rs.getDouble("Lng"));
+                    String n = rs.getString("fName") + " - " + rs.getString("Sports_Name");
+                    LatLng LL = new LatLng(rs.getDouble("Lat"),rs.getDouble("Lng"));
                     Blob bl = rs.getBlob("Sports_Icon");
-                    int i = (int) bl.length();
-                    byte[] blAsBytes = bl.getBytes(1, i);
-                    Bitmap bm = BitmapFactory.decodeByteArray(blAsBytes, 0, blAsBytes.length);
                     mo = new MarkerOptions();
                     mo.title(n);
                     mo.position(LL);
-                    if (bl != null) {
+                    if(bl != null) {
+                        int i = (int) bl.length();
+                        byte[] blAsBytes = bl.getBytes(1, i);
+                        Bitmap bm = BitmapFactory.decodeByteArray(blAsBytes, 0, blAsBytes.length);
                         mo.icon(BitmapDescriptorFactory.fromBitmap(bm));
                     }
                     markersOList.add(mo);
                 }
-
             }
         } catch (Exception ex) {
             isSuccess = false;

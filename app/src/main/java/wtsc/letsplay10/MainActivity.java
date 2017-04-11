@@ -46,7 +46,6 @@ import static wtsc.letsplay10.R.id.map;
 
 public class MainActivity extends AppCompatActivity implements
         LocationListener,
-        OnFacilitiesDataLoaded,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnMarkerClickListener,
@@ -63,13 +62,11 @@ public class MainActivity extends AppCompatActivity implements
     private Location mLastLocation;
     private Place selectedPlace;
     private Marker mCurrLocationMarker;
-    private dbGetFacilitiesList getFacils;
-//    private dbGetAllSchedules allSchedules;
     private SharedPreferences preferences;
     private Toolbar toolbar;
     private LatLngBounds curBounds;
     private Marker lastMarkerClicked;
-    private List<Marker> showMarkersList;
+    private List<MarkerOptions> showMarkerOpList;
     private final static LatLng WTSC_POS = new LatLng(35.651143, -78.704099);
     private int currentZoomLevel;
     private boolean selectedPlaceMarkerShowing;
@@ -288,7 +285,8 @@ public class MainActivity extends AppCompatActivity implements
                     mySchedules.execute(new UserBounds(currentUser,curBounds));
                     break;
                 case "ALL_SCHEDULES":
-
+                    dbGetAllSchedules allSchedules = new dbGetAllSchedules(MainActivity.this);
+                    allSchedules.execute(new UserBounds(currentUser,curBounds));
                     break;
                 case "DATE_TIME":
 
@@ -304,14 +302,22 @@ public class MainActivity extends AppCompatActivity implements
                     break;
 
             }
-            getFacils = new dbGetFacilitiesList(MainActivity.this);
-            getFacils.execute(curBounds);
+ //           getFacils = new dbGetFacilitiesList(MainActivity.this);
+ //           getFacils.execute(curBounds);
         }
     }
 
     @Override
-    public void onScheduleDataLoaded(List<MarkerOptions> schedules) {
-
+    public void onScheduleDataLoaded(List<MarkerOptions> scheduleMarkers) {
+        showMarkerOpList = scheduleMarkers;
+        mMap.clear();
+        if(scheduleMarkers != null && scheduleMarkers.size() > 0){
+            for(MarkerOptions sM : scheduleMarkers ){
+                mMap.addMarker(sM);
+            }
+        }
+        mMap.addMarker(new MarkerOptions().position(WTSC_POS).title("Wake Tech Software Corp"));
+        setCurrentLocation(mLastLocation);
     }
 
 //==================================================================================================================
@@ -320,18 +326,6 @@ public class MainActivity extends AppCompatActivity implements
         selectedPlaceMarkerShowing = false;
     }
 
-    @Override
-
-    public void onFacilitiesDataLoaded(List<Facility> facilities) {
-        facilitiesList = facilities;
-        if (facilities.size() > 0) {
-            mMap.clear();
-            for (Facility f : facilities) {
-                LatLng markerPos = new LatLng(f.getLatitude(), f.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(markerPos).title(f.getName()));
-            }
-        }
-    }
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -355,6 +349,9 @@ public class MainActivity extends AppCompatActivity implements
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if(mLastLocation != null){
                 setCurrentLocation(mLastLocation);
+                //move map camera
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude())));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(currentZoomLevel));
             }
 
         }
@@ -377,11 +374,15 @@ public class MainActivity extends AppCompatActivity implements
             mCurrLocationMarker.remove();
         }
         setCurrentLocation(location);
+        //move map camera
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(),location.getLongitude())));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(currentZoomLevel));
         //stop location updates
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this); //altered
         }
     }
+
 
     private void setCurrentLocation(Location location){
         //Place current location marker
@@ -393,9 +394,7 @@ public class MainActivity extends AppCompatActivity implements
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         mCurrLocationMarker = mMap.addMarker(markerOptions);
 
-        //move map camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(currentZoomLevel));
+
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
