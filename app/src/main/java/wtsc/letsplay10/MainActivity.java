@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements
         PlaceSelectionListener,
         OnScheduleDataLoaded{
 
-    private List<Facility> facilitiesList;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -72,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements
     private boolean selectedPlaceMarkerShowing;
     private String markerFiltersType;
     private User currentUser;
+    private Sport selectedSportType;
+    private boolean isDialogReturn;
 
 
     @Override
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements
         getSupportActionBar().setDisplayUseLogoEnabled(true);
         getSupportActionBar().setLogo(R.drawable.lets_play_icon6);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        isDialogReturn = false;
 
         markerFiltersType = "MY_SCHEDULES";
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
@@ -173,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         if(mLastLocation==null){
- //           Location local = savedInstanceState.getParcelable("lastLocation");
             Location local = new Location("");
             local.setLatitude(savedInstanceState.getFloat("Location_LAT"));
             local.setLongitude(savedInstanceState.getFloat("Location_LNG"));
@@ -195,17 +196,13 @@ public class MainActivity extends AppCompatActivity implements
 
             case R.id.sports_type:
                 //TODO create select sports type activity
-                if(markerFiltersType == "DATE_TIME"){
-                    markerFiltersType = "DATE_TIME_SPORTS_TYPE";
-                }else { markerFiltersType = "SPORTS_TYPE";}
-                onCameraIdle();
+                Intent sportsTypeIntent = new Intent(getApplicationContext(), SportsFilterActivity.class);
+                startActivityForResult(sportsTypeIntent,1);
                 return true;
 
             case R.id.date_n_times:
                 //TODO create select date and time activity
-                if(markerFiltersType == "SPORTS_TYPE"){
-                    markerFiltersType = "DATE_TIME_SPORTS_TYPE";
-                }else { markerFiltersType = "DATE_TIME";}
+                markerFiltersType = "DATE_TIME";
                 onCameraIdle();
                 return true;
 
@@ -236,6 +233,28 @@ public class MainActivity extends AppCompatActivity implements
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
 
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        switch (requestCode) {
+            case 1:     // sports type
+                if(resultCode == RESULT_OK){
+                    Sport selectedSport = data.getParcelableExtra("SELECTED_SPORT");
+                    selectedSportType = selectedSport;
+                    markerFiltersType = "SPORTS_TYPE";
+                    onCameraIdle();
+                }
+                break;
+            case 2:     // date & time
+                if(resultCode == RESULT_OK){
+
+                    markerFiltersType = "DATE_TIME";
+                    onCameraIdle();
+                }
+                break;
+            default:
         }
     }
 
@@ -292,7 +311,9 @@ public class MainActivity extends AppCompatActivity implements
 
                     break;
                 case "SPORTS_TYPE":
-
+                    isDialogReturn = true;
+                    dbGetSportTypeScheduleMarkers sportsTypeSchedules = new dbGetSportTypeScheduleMarkers(MainActivity.this);
+                    sportsTypeSchedules.execute(new SportsBounds(selectedSportType,curBounds));
                     break;
                 case "DATE_TIME_SPORTS_TYPE":
 
@@ -302,8 +323,6 @@ public class MainActivity extends AppCompatActivity implements
                     break;
 
             }
- //           getFacils = new dbGetFacilitiesList(MainActivity.this);
- //           getFacils.execute(curBounds);
         }
     }
 
@@ -342,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
-        if (ContextCompat.checkSelfPermission(this,
+        if (!isDialogReturn && ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);      //altered
@@ -353,8 +372,8 @@ public class MainActivity extends AppCompatActivity implements
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude())));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(currentZoomLevel));
             }
-
         }
+        isDialogReturn = false;
     }
 
     @Override
