@@ -33,13 +33,17 @@
 
         <activity android:name=".AddScheduleActivity">
         </activity>
-    <activity android:name=".AddFacility">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
+        <activity android:name=".SportsFilterActivity">
+        </activity>
+
+        <activity android:name=".DateTimeFilterActivity">
+        </activity>
+
+
+        <activity android:name=".AddFacility">
+        </activity>
+
 </application>
 
 </manifest>
