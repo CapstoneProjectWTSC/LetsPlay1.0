@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements
         markerFiltersType = "MY_SCHEDULES";
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
         String json = preferences.getString("User", "");
-      //  json="";
+   //     json="";
         if (json.equals("")) {
             startActivity(new Intent(getApplicationContext(), SignIn.class ));
         }

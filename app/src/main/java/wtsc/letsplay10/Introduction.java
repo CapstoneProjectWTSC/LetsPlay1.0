@@ -1,6 +1,5 @@
 package wtsc.letsplay10;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -134,7 +133,7 @@ public class Introduction extends AppCompatActivity
     public void onDBFindGameName(boolean isInDatabase) {
         if(isInDatabase){
             String message = "Username is already taken";
-            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signIn), message, Snackbar.LENGTH_SHORT);
+            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signInBTN), message, Snackbar.LENGTH_SHORT);
             invalidLogin.show();
         }
         else
@@ -148,7 +147,7 @@ public class Introduction extends AppCompatActivity
     public void onDBFindEmail(boolean isInDatabase) {
         if(isInDatabase){
             String message = "Email is already in use";
-            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signIn), message, Snackbar.LENGTH_SHORT);
+            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signInBTN), message, Snackbar.LENGTH_SHORT);
             invalidLogin.show();
         }
         else
@@ -157,7 +156,7 @@ public class Introduction extends AppCompatActivity
             String message = passwordCheck.validateNewPass(passwordSubmissionString, passwordConfirmationString);
             if(!message.equals("Success!"))
             {
-                Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signIn), message, Snackbar.LENGTH_SHORT);
+                Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signInBTN), message, Snackbar.LENGTH_SHORT);
                 invalidLogin.show();
             }
             else {
@@ -176,12 +175,13 @@ public class Introduction extends AppCompatActivity
 
     @Override
     public void onDBNewUserAdded(User NewUser) {
-            int id = NewUser.getID();
+            currentUser.setID(NewUser.getID());
             SharedPreferences.Editor prefsEditor = preferences.edit();
             Gson gson = new Gson();
             String json = gson.toJson(currentUser);
             prefsEditor.putString("User", json);
             prefsEditor.commit();
-        startActivity(new Intent(getApplicationContext(),MainActivity.class));
+            finish();
+       // startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }
 }
