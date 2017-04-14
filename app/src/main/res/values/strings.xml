@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">LetsPlay1.0</string>
-    <string name="emailEntryText">E-mail:</string>
-    <string name="usernameEntryText">Username:</string>
-    <string name="passwordEntryText">Password:</string>
-    <string name="passwordConfirmationText">Confirm Password:</string>
-    <string name="confirmButton">Confirm</string>
+    <string name="emailEntryText">E-mail:*</string>
+    <string name="usernameEntryText">Game Name:*</string>
+    <string name="passwordEntryText">Password:*</string>
+    <string name="passwordConfirmationText">Confirm Password:*</string>
+    <string name="confirmButton">Create Account</string>
     <string name="signInButton">Sign In</string>
     <string name="createAccountButton">Don\'t have an account? Create one!</string>
     <string name="action_favorite">Favorite Action</string>
