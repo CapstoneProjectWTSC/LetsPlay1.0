@@ -5,6 +5,7 @@ package wtsc.letsplay10;
  * Created by samal on 3/9/2017.
  */
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -94,7 +95,14 @@ public class SignIn extends AppCompatActivity implements
                 vUser.execute(emailFieldString,passwordFieldString);
                 break;
             case createAccountBTN:
-                startActivity(new Intent(getApplicationContext(), Introduction.class));
+                startActivityForResult(new Intent(getApplicationContext(), Introduction.class),1);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == Activity.RESULT_OK ){
+            finish();
         }
     }
 
@@ -115,9 +123,12 @@ public class SignIn extends AppCompatActivity implements
                 message = "Invalid password error";
             }
             else {message = "Invalid email error";}
-            Snackbar invalidLogin = Snackbar.make(findViewById(signInBTN), message, Snackbar.LENGTH_SHORT);
+            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
             invalidLogin.show();
         }
     }
+
+
+
 }
 

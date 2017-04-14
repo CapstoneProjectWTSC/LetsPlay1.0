@@ -184,12 +184,12 @@ public class AddFacility extends AppCompatActivity implements
         if (checkedId == R.id.clButton)
         {
             Toast.makeText(getApplicationContext(), "Use current location",
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
         }
         else
         {
             Toast.makeText(getApplicationContext(), "Enter in an address",
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
         }
     }
 
@@ -197,7 +197,7 @@ public class AddFacility extends AppCompatActivity implements
     public void onDBNewFacilityAdded(Facility NewFacility) {
         String name = NewFacility.getName();
         String message = "The facility " + name + " successfully added!";
-        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.submitButton), message, Snackbar.LENGTH_SHORT);
+        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.submitButton), message, Snackbar.LENGTH_LONG);
         facilityAddedSnackbar.show();
         startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }

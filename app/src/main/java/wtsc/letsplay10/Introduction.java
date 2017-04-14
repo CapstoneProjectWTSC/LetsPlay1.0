@@ -1,5 +1,6 @@
 package wtsc.letsplay10;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -122,8 +123,30 @@ public class Introduction extends AppCompatActivity
                 firstNameSubmissionString= firstNameSubmission.getText().toString();
                 lastNameSubmissionString= lastNameSubmission.getText().toString();
 
-                db_findGameName = new dbFindGameName(Introduction.this);    //check if currentUser is in database
-                db_findGameName.execute(usernameSubmissionString);      // returns in onDBFindGameName
+                if(emailSubmissionString.isEmpty()){
+                    String message = "Email Required";
+                    Snackbar invalidLogin = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+                    invalidLogin.show();
+                }else if(usernameSubmissionString.isEmpty()){
+                    String message = "Game Name Required";
+                    Snackbar invalidLogin = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+                    invalidLogin.show();
+                }else if(passwordSubmissionString.isEmpty()){
+                    String message = "Password Required";
+                    Snackbar invalidLogin = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+                    invalidLogin.show();
+                }else if(passwordConfirmationString == null || passwordConfirmationString == ""){
+                    String message = "Password Confirmation Required";
+                    Snackbar invalidLogin = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+                    invalidLogin.show();
+                }else if(!passwordSubmissionString.equals(passwordConfirmationString)){
+                    String message = "Passwords Do Not Match";
+                    Snackbar invalidLogin = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+                    invalidLogin.show();
+                }else {
+                    db_findGameName = new dbFindGameName(Introduction.this);    //check if currentUser is in database
+                    db_findGameName.execute(usernameSubmissionString);      // returns in onDBFindGameName
+                }
 
                 break;
         }
@@ -133,7 +156,7 @@ public class Introduction extends AppCompatActivity
     public void onDBFindGameName(boolean isInDatabase) {
         if(isInDatabase){
             String message = "Username is already taken";
-            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signInBTN), message, Snackbar.LENGTH_SHORT);
+            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
             invalidLogin.show();
         }
         else
@@ -147,7 +170,7 @@ public class Introduction extends AppCompatActivity
     public void onDBFindEmail(boolean isInDatabase) {
         if(isInDatabase){
             String message = "Email is already in use";
-            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signInBTN), message, Snackbar.LENGTH_SHORT);
+            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
             invalidLogin.show();
         }
         else
@@ -156,7 +179,7 @@ public class Introduction extends AppCompatActivity
             String message = passwordCheck.validateNewPass(passwordSubmissionString, passwordConfirmationString);
             if(!message.equals("Success!"))
             {
-                Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signInBTN), message, Snackbar.LENGTH_SHORT);
+                Snackbar invalidLogin = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
                 invalidLogin.show();
             }
             else {
@@ -181,7 +204,7 @@ public class Introduction extends AppCompatActivity
             String json = gson.toJson(currentUser);
             prefsEditor.putString("User", json);
             prefsEditor.commit();
+            setResult(Activity.RESULT_OK);
             finish();
-       // startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }
 }

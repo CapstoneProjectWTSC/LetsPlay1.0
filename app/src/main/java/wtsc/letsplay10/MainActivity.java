@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements
     private boolean isDialogReturn;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,16 +100,6 @@ public class MainActivity extends AppCompatActivity implements
 
         markerFiltersType = "MY_SCHEDULES";
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
-        String json = preferences.getString("User", "");
-   //     json="";
-        if (json.equals("")) {
-            startActivity(new Intent(getApplicationContext(), SignIn.class ));
-        }
-        currentUser = new User();
-        Gson gson = new Gson();
-        currentUser = gson.fromJson(json, User.class);
-
-
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -116,17 +107,28 @@ public class MainActivity extends AppCompatActivity implements
         autocompleteFragment.setOnPlaceSelectedListener(this);
         autocompleteFragment.setHint("Find Location");
 
-
-
-
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
 
+// ---------------------------for testing -----------------------------------------------
+  //      SharedPreferences.Editor editor = preferences.edit();
+  //      editor.clear();
+ //       editor.commit();
+//------------------------------------------------------------------------------------------
+        String json = preferences.getString("User", "");
+        //      json="";
+        if (json.equals("")) {
+            startActivityForResult(new Intent(getApplicationContext(), SignIn.class ),1);
+        }
+        currentUser = new User();
+        Gson gson = new Gson();
+        currentUser = gson.fromJson(json, User.class);
 
     }
 
-    @Override
+
+        @Override
     public void onPlaceSelected(Place place) {
         // TODO: Get info about the selected place.
        // String s = (String)place.getName();
@@ -184,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if(lastMarkerClicked != null){lastMarkerClicked.hideInfoWindow();}
         switch (item.getItemId()) {
             case R.id.view_schedules:
                 // User chose the "Settings" item, show the app settings UI...
@@ -197,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.sports_type:
                 //TODO create select sports type activity
                 Intent sportsTypeIntent = new Intent(getApplicationContext(), SportsFilterActivity.class);
-                startActivityForResult(sportsTypeIntent,1);
+                startActivityForResult(sportsTypeIntent,2);
                 return true;
 
             case R.id.date_n_times:
@@ -239,7 +242,13 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         switch (requestCode) {
-            case 1:     // sports type
+            case 1:
+                String json = preferences.getString("User", "");
+                currentUser = new User();
+                Gson gson = new Gson();
+                currentUser = gson.fromJson(json, User.class);
+                break;
+            case 2:     // sports type
                 if(resultCode == RESULT_OK){
                     Sport selectedSport = data.getParcelableExtra("SELECTED_SPORT");
                     selectedSportType = selectedSport;
@@ -247,13 +256,14 @@ public class MainActivity extends AppCompatActivity implements
                     onCameraIdle();
                 }
                 break;
-            case 2:     // date & time
+            case 3:     // date & time
                 if(resultCode == RESULT_OK){
 
                     markerFiltersType = "DATE_TIME";
                     onCameraIdle();
                 }
                 break;
+
             default:
         }
     }
@@ -332,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements
         mMap.clear();
         if(scheduleMarkers != null && scheduleMarkers.size() > 0){
             for(MarkerOptions sM : scheduleMarkers ){
-                mMap.addMarker(sM);
+                Marker marker = mMap.addMarker(sM);
             }
         }
         mMap.addMarker(new MarkerOptions().position(WTSC_POS).title("Wake Tech Software Corp"));
