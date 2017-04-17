@@ -17,7 +17,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
 
@@ -183,13 +182,15 @@ public class AddFacility extends AppCompatActivity implements
     public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
         if (checkedId == R.id.clButton)
         {
-            Toast.makeText(getApplicationContext(), "Use current location",
-                    Toast.LENGTH_LONG).show();
+            String message = "Use current location";
+            Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+            facilityAddedSnackbar.show();
         }
         else
         {
-            Toast.makeText(getApplicationContext(), "Enter in an address",
-                    Toast.LENGTH_LONG).show();
+            String message = "Enter in an address";
+            Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+            facilityAddedSnackbar.show();
         }
     }
 
@@ -197,7 +198,7 @@ public class AddFacility extends AppCompatActivity implements
     public void onDBNewFacilityAdded(Facility NewFacility) {
         String name = NewFacility.getName();
         String message = "The facility " + name + " successfully added!";
-        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.submitButton), message, Snackbar.LENGTH_LONG);
+        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
         facilityAddedSnackbar.show();
         startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }

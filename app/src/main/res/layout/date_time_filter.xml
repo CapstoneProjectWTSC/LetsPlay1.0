@@ -110,15 +110,6 @@
         android:layout_height="match_parent" >
 
 
-        <EditText
-            android:id="@+id/begin_timeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Time 03:00pm"
-            android:inputType="time" />
-
-
     </TableRow>
     <TableRow
         android:layout_width="match_parent"
@@ -155,13 +146,6 @@
         android:layout_height="match_parent" >
 
 
-        <EditText
-            android:id="@+id/end_timeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Time 03:00pm"
-            android:inputType="time" />
     </TableRow>
 
     <TableRow
@@ -174,7 +158,7 @@
         android:layout_height="match_parent">
 
         <Button
-            android:id="@+id/setDateTimeBTN"
+            android:id="@+id/dateTimeBTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -183,5 +167,29 @@
             android:text="Set Date Time Filter" />
     </TableRow>
 
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/cancelBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_span="3"
+            android:paddingTop="15dp"
+            android:text="Cancel" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/snackbarCoordinatorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </TableLayout>

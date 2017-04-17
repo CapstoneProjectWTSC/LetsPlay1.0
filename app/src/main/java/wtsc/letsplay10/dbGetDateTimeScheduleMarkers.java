@@ -13,6 +13,7 @@ import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,13 +21,13 @@ import java.util.List;
  * Created by Ricky Stambach on 2/21/2017.
  */
 
-public class dbGetTDSTSchedules extends AsyncTask<UserBounds,String,List<MarkerOptions>> {
+public class dbGetDateTimeScheduleMarkers extends AsyncTask<DateTimeBounds,String,List<MarkerOptions>> {
 
     private dbConnectionClass connectionClass;
     private OnScheduleDataLoaded dataLoaded;
     private List<Schedule> schedulesList;
 
-    public dbGetTDSTSchedules(OnScheduleDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetDateTimeScheduleMarkers(OnScheduleDataLoaded activityContext){this.dataLoaded = activityContext;}
 
     @Override
     protected void onPreExecute() {
@@ -39,7 +40,7 @@ public class dbGetTDSTSchedules extends AsyncTask<UserBounds,String,List<MarkerO
     }
 
     @Override
-    protected List<MarkerOptions> doInBackground(UserBounds... params) {
+    protected List<MarkerOptions> doInBackground(DateTimeBounds... params) {
 
         String z = "";
         Boolean isSuccess = false;
@@ -55,15 +56,30 @@ public class dbGetTDSTSchedules extends AsyncTask<UserBounds,String,List<MarkerO
                     LatLng sw = params[0].getBounds().southwest;
                     LatLng ne = params[0].getBounds().northeast;
 
-                    query = "select f.[facility_ID], f.[Name] AS fName, f.Lat, f.Lng, f.[Address1],f.[Address2]" +
-                            ",f.[City],f.[State],f.[Zip],f.[Lat],f.[Lng],f.[Notes]" +
-                            ",s.[schedule_ID]" +
-                            " from [facility] f join [schedule] s " + "" +
-                            "on f.[facility_ID] = s.[Facility_ID]" +
-                            " WHERE " +
+ //                   GregorianCalendar bCalendar = new GregorianCalendar();
+   //                 bCalendar.setTime(params[0].getbDateTime());
+     //               GregorianCalendar eCalendar = new GregorianCalendar();
+       //             eCalendar.setTime(params[0].geteDateTime());
+
+                    String bDateTxt = new SimpleDateFormat("MM/dd/yyyy").format(params[0].getbDateTime());
+                    String eDateTxt = new SimpleDateFormat("MM/dd/yyyy").format(params[0].geteDateTime());
+
+                    query = "select f.[facility_ID], f.[Name] AS fName, f.Lat, f.Lng, f.[Address1],f.[Address2]"+
+                            ",f.[City],f.[State],f.[Zip],f.[Lat],f.[Lng],f.[Notes],s.[schedule_ID], "+
+                            "t.[Sports_Name],t.[Sports_Icon] "+
+                            "FROM [schedule] s "+
+                            "JOIN facility as f on f.Facility_ID = s.Facility_ID "+
+                            "JOIN SportsType as t on t.SportsType_ID = s.SportsType_ID "+
+                            "JOIN UserSchedule as u on u.Schedule_ID = s.Schedule_ID "+
+                            "JOIN Schedule as c on c.Schedule_ID = u.Schedule_ID "+
+                            "WHERE "+
                             "[Lat] > " + sw.latitude + " AND [Lat] < " + ne.latitude + " AND " +
-                            "[Lng] > " + sw.longitude + " AND [Lng] < " + ne.longitude +
+                            "[Lng] > " + sw.longitude + " AND [Lng] < " + ne.longitude + " AND " +
+                            "c.Schedule_DateTime BETWEEN '"+ bDateTxt + "' AND '" + eDateTxt + "'" +
+ //                           "[User_ID] = " + params[0].getUser().getID() +
+
                             " ORDER BY f.[Name]";
+
                     //TODO change query for date_time_sports_type
                 } else {
                     //query = "select * from [Schedule]";
