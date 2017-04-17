@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -39,6 +39,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import static wtsc.letsplay10.R.id.map;
@@ -73,7 +76,8 @@ public class MainActivity extends AppCompatActivity implements
     private User currentUser;
     private Sport selectedSportType;
     private boolean isDialogReturn;
-
+    private String bDateText, eDateText;
+    private Date bDateTime, eDateTime;
 
 
     @Override
@@ -97,6 +101,8 @@ public class MainActivity extends AppCompatActivity implements
         getSupportActionBar().setLogo(R.drawable.lets_play_icon6);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         isDialogReturn = false;
+        bDateTime = new Date();
+        eDateTime = new Date();
 
         markerFiltersType = "MY_SCHEDULES";
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
@@ -205,8 +211,10 @@ public class MainActivity extends AppCompatActivity implements
 
             case R.id.date_n_times:
                 //TODO create select date and time activity
-                markerFiltersType = "DATE_TIME";
-                onCameraIdle();
+//                markerFiltersType = "DATE_TIME";
+ //               onCameraIdle();
+                Intent dateTimeFilterIntent = new Intent(getApplicationContext(), DateTimeFilterActivity.class);
+                startActivityForResult(dateTimeFilterIntent,3);
                 return true;
 
             case R.id.view_all:
@@ -250,16 +258,40 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case 2:     // sports type
                 if(resultCode == RESULT_OK){
-                    Sport selectedSport = data.getParcelableExtra("SELECTED_SPORT");
-                    selectedSportType = selectedSport;
+  //                  Sport selectedSport = data.getParcelableExtra("SELECTED_SPORT");
+                    selectedSportType = data.getParcelableExtra("SELECTED_SPORT");
                     markerFiltersType = "SPORTS_TYPE";
                     onCameraIdle();
                 }
                 break;
             case 3:     // date & time
                 if(resultCode == RESULT_OK){
-
                     markerFiltersType = "DATE_TIME";
+                    SimpleDateFormat df = new SimpleDateFormat("MM/dd/yy");
+                    bDateText = data.getExtras().getString("BEGINNING_DATE_TIME");
+                    eDateText = data.getExtras().getString("ENDING_DATE_TIME");
+
+                    try {
+                        Date parsed = df.parse(bDateText);
+                        bDateTime = new Date(parsed.getTime() );
+
+                    } catch (ParseException e) {
+                        String message = "Invalided Start Date or Time";
+                        Snackbar invalidbDate = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+                        invalidbDate.show();
+                        markerFiltersType = "MY_SCHEDULES";
+                    }
+
+                    try {
+                        Date parsed = df.parse(eDateText);
+                        eDateTime = new Date(parsed.getTime() );
+
+                    } catch (ParseException e) {
+                        String message = "Invalided Ending Date or Time";
+                        Snackbar invalideDate = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+                        invalideDate.show();
+                        markerFiltersType = "MY_SCHEDULES";
+                    }
                     onCameraIdle();
                 }
                 break;
@@ -283,9 +315,7 @@ public class MainActivity extends AppCompatActivity implements
         map.getUiSettings().setZoomControlsEnabled(true);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
+            if (checkLocationPermission()) {
                 mMap.setMyLocationEnabled(true);
             }
         }
@@ -318,15 +348,13 @@ public class MainActivity extends AppCompatActivity implements
                     allSchedules.execute(new UserBounds(currentUser,curBounds));
                     break;
                 case "DATE_TIME":
-
+                    dbGetDateTimeScheduleMarkers dateSchedules = new dbGetDateTimeScheduleMarkers(MainActivity.this);
+                    dateSchedules.execute(new DateTimeBounds(bDateTime,eDateTime,curBounds));
                     break;
                 case "SPORTS_TYPE":
                     isDialogReturn = true;
                     dbGetSportTypeScheduleMarkers sportsTypeSchedules = new dbGetSportTypeScheduleMarkers(MainActivity.this);
                     sportsTypeSchedules.execute(new SportsBounds(selectedSportType,curBounds));
-                    break;
-                case "DATE_TIME_SPORTS_TYPE":
-
                     break;
                 default:
 
@@ -371,9 +399,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
-        if (!isDialogReturn && ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        if (!isDialogReturn && checkLocationPermission()) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);      //altered
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if(mLastLocation != null){
@@ -482,7 +508,9 @@ public class MainActivity extends AppCompatActivity implements
                 } else {
 
                     // Permission denied, Disable the functionality that depends on this permission.
-                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
+                    String message = "Permission Denied";
+                    Snackbar invalidLogin = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+                    invalidLogin.show();
                 }
                 return;
             }
