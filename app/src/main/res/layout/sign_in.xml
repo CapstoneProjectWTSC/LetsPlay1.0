@@ -6,13 +6,12 @@
     android:id="@+id/signIn_page_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:stretchColumns="1"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:layout_centerInParent="true"
-
+    android:shrinkColumns="0"
+    android:stretchColumns="0"
     tools:context="wtsc.letsplay10.Introduction">
 
 
@@ -22,17 +21,21 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
             app:srcCompat="@drawable/lets_play_icon5" />
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingTop="15dp"
-            android:text="LetsPlay"
-            android:textSize="30sp" />
+            android:paddingTop="18dp"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:text="Let's Play!"
+            android:textSize="25sp" />
     </TableRow>
 
     <TableRow android:layout_height="match_parent">
