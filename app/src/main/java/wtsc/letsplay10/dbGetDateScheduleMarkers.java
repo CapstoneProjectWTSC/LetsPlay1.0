@@ -21,13 +21,12 @@ import java.util.List;
  * Created by Ricky Stambach on 2/21/2017.
  */
 
-public class dbGetDateTimeScheduleMarkers extends AsyncTask<DateTimeBounds,String,List<MarkerOptions>> {
+public class dbGetDateScheduleMarkers extends AsyncTask<DateTimeBounds,String,List<MarkerOptions>> {
 
     private dbConnectionClass connectionClass;
     private OnScheduleDataLoaded dataLoaded;
-    private List<Schedule> schedulesList;
 
-    public dbGetDateTimeScheduleMarkers(OnScheduleDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetDateScheduleMarkers(OnScheduleDataLoaded activityContext){this.dataLoaded = activityContext;}
 
     @Override
     protected void onPreExecute() {
@@ -55,12 +54,6 @@ public class dbGetDateTimeScheduleMarkers extends AsyncTask<DateTimeBounds,Strin
                 if (params.length == 1) {
                     LatLng sw = params[0].getBounds().southwest;
                     LatLng ne = params[0].getBounds().northeast;
-
- //                   GregorianCalendar bCalendar = new GregorianCalendar();
-   //                 bCalendar.setTime(params[0].getbDateTime());
-     //               GregorianCalendar eCalendar = new GregorianCalendar();
-       //             eCalendar.setTime(params[0].geteDateTime());
-
                     String bDateTxt = new SimpleDateFormat("MM/dd/yyyy").format(params[0].getbDateTime());
                     String eDateTxt = new SimpleDateFormat("MM/dd/yyyy").format(params[0].geteDateTime());
 
@@ -76,13 +69,9 @@ public class dbGetDateTimeScheduleMarkers extends AsyncTask<DateTimeBounds,Strin
                             "[Lat] > " + sw.latitude + " AND [Lat] < " + ne.latitude + " AND " +
                             "[Lng] > " + sw.longitude + " AND [Lng] < " + ne.longitude + " AND " +
                             "c.Schedule_DateTime BETWEEN '"+ bDateTxt + "' AND '" + eDateTxt + "'" +
- //                           "[User_ID] = " + params[0].getUser().getID() +
-
                             " ORDER BY f.[Name]";
 
-                    //TODO change query for date_time_sports_type
                 } else {
-                    //query = "select * from [Schedule]";
                     return null;
                 }
                 Statement stmt = con.createStatement();
@@ -90,27 +79,25 @@ public class dbGetDateTimeScheduleMarkers extends AsyncTask<DateTimeBounds,Strin
                 MarkerOptions mo;
 
                 while (rs.next()) {
-                    String n = rs.getString("fName") + rs.getString("Sports_Name");
-                    LatLng LL = new LatLng(rs.getDouble("Lat"), rs.getDouble("Lng"));
+                    String n = rs.getString("fName") + " - " + rs.getString("Sports_Name");
+                    LatLng LL = new LatLng(rs.getDouble("Lat"),rs.getDouble("Lng"));
                     Blob bl = rs.getBlob("Sports_Icon");
-                    int i = (int) bl.length();
-                    byte[] blAsBytes = bl.getBytes(1, i);
-                    Bitmap bm = BitmapFactory.decodeByteArray(blAsBytes, 0, blAsBytes.length);
                     mo = new MarkerOptions();
                     mo.title(n);
                     mo.position(LL);
-                    if (bl != null) {
+                    if(bl != null) {
+                        int i = (int) bl.length();
+                        byte[] blAsBytes = bl.getBytes(1, i);
+                        Bitmap bm = BitmapFactory.decodeByteArray(blAsBytes, 0, blAsBytes.length);
                         mo.icon(BitmapDescriptorFactory.fromBitmap(bm));
                     }
                     markersOList.add(mo);
                 }
-
             }
         } catch (Exception ex) {
             isSuccess = false;
             z = "Exceptions";
         }
-
         return markersOList;
     }
 

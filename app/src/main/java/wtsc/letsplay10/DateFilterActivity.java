@@ -16,7 +16,7 @@ import java.util.Date;
  * Created by Ricky Stambach on 4/11/2017.
  */
 
-public class DateTimeFilterActivity extends AppCompatActivity {
+public class DateFilterActivity extends AppCompatActivity {
 
     private Button dateTimeSelectedBTN;
     private Button cancelBTN;
@@ -48,14 +48,9 @@ public class DateTimeFilterActivity extends AppCompatActivity {
     View.OnClickListener onDateTimeButtonClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
- //           long time = System.currentTimeMillis();
- //           Date dateTime = new Date();
+
             SimpleDateFormat df = new SimpleDateFormat("MM/dd/yy");
             String s1 = new String(bDateText.getText().toString());
- //           String s2 = new String(eDateText.getText().toString());
-   //         s2.replace(" ","");
-     //       s1 = s1+" "+s2;
- //           bDateTime = s1;
 
             try {
                 Date parsed = df.parse(s1);
@@ -68,10 +63,6 @@ public class DateTimeFilterActivity extends AppCompatActivity {
             }
 
             s1 = new String(eDateText.getText().toString());
-//            s2 = new String(eTimeText.getText().toString());
-  //          s2.replace(" ","");
-    //        s1 = s1+" "+s2;
-//            eDateTime = s1;
 
             try {
                 Date parsed = df.parse(s1);

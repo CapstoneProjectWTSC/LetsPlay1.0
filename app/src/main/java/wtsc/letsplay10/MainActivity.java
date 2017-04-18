@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements
  //       editor.commit();
 //------------------------------------------------------------------------------------------
         String json = preferences.getString("User", "");
-        //      json="";
+              json="";
         if (json.equals("")) {
             startActivityForResult(new Intent(getApplicationContext(), SignIn.class ),1);
         }
@@ -149,16 +149,12 @@ public class MainActivity extends AppCompatActivity implements
         selectedMarker.showInfoWindow();;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, currentZoomLevel));
         selectedPlaceMarkerShowing = true;
-
-        //             Log.i(TAG, "Place: " + place.getName());
     }
 
     @Override
     public void onError(Status status) {
         // TODO: Handle the error.
-
-        //             Log.i(TAG, "An error occurred: " + status);
-    }
+   }
 
 
 
@@ -176,7 +172,6 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
     public void onSaveInstanceState(Bundle outState) {
- //        outState.putParcelable("lastLocation",mLastLocation);
          super.onSaveInstanceState(outState);
     }
 
@@ -210,10 +205,7 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
 
             case R.id.date_n_times:
-                //TODO create select date and time activity
-//                markerFiltersType = "DATE_TIME";
- //               onCameraIdle();
-                Intent dateTimeFilterIntent = new Intent(getApplicationContext(), DateTimeFilterActivity.class);
+                Intent dateTimeFilterIntent = new Intent(getApplicationContext(), DateFilterActivity.class);
                 startActivityForResult(dateTimeFilterIntent,3);
                 return true;
 
@@ -227,23 +219,16 @@ public class MainActivity extends AppCompatActivity implements
                 Intent addSchIntent = new Intent(getApplicationContext(), AddScheduleActivity.class);
                 addSchIntent.putExtra("LAST_LOCATION",mLastLocation);
                 startActivity(addSchIntent);
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
                 return true;
 
             case R.id.add_facility:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
                 Intent addFacIntent = new Intent(getApplicationContext(), AddFacility.class);
                 addFacIntent.putExtra("LAST_LOCATION",mLastLocation);
                 startActivity(addFacIntent);
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
@@ -258,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case 2:     // sports type
                 if(resultCode == RESULT_OK){
-  //                  Sport selectedSport = data.getParcelableExtra("SELECTED_SPORT");
                     selectedSportType = data.getParcelableExtra("SELECTED_SPORT");
                     markerFiltersType = "SPORTS_TYPE";
                     onCameraIdle();
@@ -274,7 +258,6 @@ public class MainActivity extends AppCompatActivity implements
                     try {
                         Date parsed = df.parse(bDateText);
                         bDateTime = new Date(parsed.getTime() );
-
                     } catch (ParseException e) {
                         String message = "Invalided Start Date or Time";
                         Snackbar invalidbDate = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
@@ -285,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements
                     try {
                         Date parsed = df.parse(eDateText);
                         eDateTime = new Date(parsed.getTime() );
-
                     } catch (ParseException e) {
                         String message = "Invalided Ending Date or Time";
                         Snackbar invalideDate = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
@@ -348,7 +330,8 @@ public class MainActivity extends AppCompatActivity implements
                     allSchedules.execute(new UserBounds(currentUser,curBounds));
                     break;
                 case "DATE_TIME":
-                    dbGetDateTimeScheduleMarkers dateSchedules = new dbGetDateTimeScheduleMarkers(MainActivity.this);
+                    isDialogReturn = true;
+                    dbGetDateScheduleMarkers dateSchedules = new dbGetDateScheduleMarkers(MainActivity.this);
                     dateSchedules.execute(new DateTimeBounds(bDateTime,eDateTime,curBounds));
                     break;
                 case "SPORTS_TYPE":
@@ -357,9 +340,7 @@ public class MainActivity extends AppCompatActivity implements
                     sportsTypeSchedules.execute(new SportsBounds(selectedSportType,curBounds));
                     break;
                 default:
-
                     break;
-
             }
         }
     }
@@ -389,8 +370,6 @@ public class MainActivity extends AppCompatActivity implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
-//                .addApi(Places.GEO_DATA_API)
-//                .addApi(Places.PLACE_DETECTION_API)
                 .enableAutoManage(this, 0, this)
                 .build();
         mGoogleApiClient.connect();
@@ -441,15 +420,12 @@ public class MainActivity extends AppCompatActivity implements
 
     private void setCurrentLocation(Location location){
         //Place current location marker
-
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("My Location");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -471,8 +447,6 @@ public class MainActivity extends AppCompatActivity implements
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
-
-
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
@@ -519,7 +493,4 @@ public class MainActivity extends AppCompatActivity implements
             //You can add here other case statements according to your requirement.
         }
     }
-
-
-
 }

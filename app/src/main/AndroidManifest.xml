@@ -37,7 +37,7 @@
         <activity android:name=".SportsFilterActivity">
         </activity>
 
-        <activity android:name=".DateTimeFilterActivity">
+        <activity android:name=".DateFilterActivity">
         </activity>
 
 
