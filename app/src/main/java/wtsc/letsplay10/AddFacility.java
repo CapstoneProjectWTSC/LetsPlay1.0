@@ -1,6 +1,7 @@
 package wtsc.letsplay10;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,9 +20,19 @@ import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnCameraIdleListener;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,6 +47,7 @@ public class AddFacility extends AppCompatActivity implements
     private Facility newFacility;
     private double latitude;
     private double longitude;
+    public static LatLng addFromMapLatLng;
     dbAddNewFacility db_AddNewFacility;
     dbGetFacilitiesList db_GetFacilitiesList;
     private Location mLastLocation;
@@ -173,8 +186,16 @@ public class AddFacility extends AppCompatActivity implements
 
 
                 break;
-            //case R.id.fromMap:
-              //  break;
+            case R.id.addFromMap:
+                startActivity(new Intent(getApplicationContext(),AddFromMap.class));
+                this.latitude = addFromMapLatLng.latitude;
+                this.longitude = addFromMapLatLng.longitude;
+                try {
+                    findLocationInformation();
+                } catch (IOException IOE) {
+                    IOE.printStackTrace();
+                }
+                break;
         }
     }
 
@@ -202,4 +223,5 @@ public class AddFacility extends AppCompatActivity implements
         facilityAddedSnackbar.show();
         startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }
+
 }
