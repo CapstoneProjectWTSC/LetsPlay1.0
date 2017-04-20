@@ -12,9 +12,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -85,9 +85,9 @@ public class dbGetMySchedulesMarkers extends AsyncTask<UserBounds,String,List<Ma
 
                 while (rs.next()) {
                     String n = rs.getString("fName");
-                    Date d = rs.getDate("Schedule_DateTime");
+                    Timestamp ts = rs.getTimestamp("Schedule_DateTime");
                     DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm aa");
-                    String ds = dateFormat.format(d);
+                    String ds = dateFormat.format(ts);
                     String s = rs.getString("Sports_Name") + " - " +  ds;
 
                     LatLng LL = new LatLng(rs.getDouble("Lat"),rs.getDouble("Lng"));

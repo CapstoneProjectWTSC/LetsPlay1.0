@@ -12,9 +12,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.List;
  * Created by Ricky Stambach on 2/21/2017.
  */
 
-public class dbGetAllSchedules extends AsyncTask<UserBounds,String,List<MarkerOptions>> {
+public class dbGetAllSchedulesMarkers extends AsyncTask<UserBounds,String,List<MarkerOptions>> {
 
     private dbConnectionClass connectionClass;
     private OnScheduleDataLoaded dataLoaded;
@@ -32,7 +32,7 @@ public class dbGetAllSchedules extends AsyncTask<UserBounds,String,List<MarkerOp
     private Context mContext;
 
 
-    public dbGetAllSchedules(OnScheduleDataLoaded activityContext, Context context){
+    public dbGetAllSchedulesMarkers(OnScheduleDataLoaded activityContext, Context context){
         this.dataLoaded = activityContext;
         mContext = context;
     }
@@ -82,9 +82,9 @@ public class dbGetAllSchedules extends AsyncTask<UserBounds,String,List<MarkerOp
 
                 while (rs.next()) {
                     String n = rs.getString("fName");
-                    Date d = rs.getDate("Schedule_DateTime");
+                    Timestamp ts = rs.getTimestamp("Schedule_DateTime");
                     DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm aa");
-                    String ds = dateFormat.format(d);
+                    String ds = dateFormat.format(ts);
                     String s = rs.getString("Sports_Name") + " - " +  ds;
 
                     LatLng LL = new LatLng(rs.getDouble("Lat"),rs.getDouble("Lng"));
