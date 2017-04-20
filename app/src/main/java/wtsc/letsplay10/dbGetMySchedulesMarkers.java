@@ -1,6 +1,8 @@
 package wtsc.letsplay10;
 
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -9,10 +11,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.sql.Blob;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +29,12 @@ public class dbGetMySchedulesMarkers extends AsyncTask<UserBounds,String,List<Ma
     private dbConnectionClass connectionClass;
     private OnScheduleDataLoaded dataLoaded;
     private List<Schedule> schedulesList;
+    private Context mContext;
 
-    public dbGetMySchedulesMarkers(OnScheduleDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetMySchedulesMarkers(OnScheduleDataLoaded activityContext, Context context){
+        this.dataLoaded = activityContext;
+        mContext = context;
+    }
 
     @Override
     protected void onPreExecute() {
@@ -57,7 +65,7 @@ public class dbGetMySchedulesMarkers extends AsyncTask<UserBounds,String,List<Ma
 
                     query = "select f.[facility_ID], f.[Name] AS fName, f.Lat, f.Lng, f.[Address1],f.[Address2]"+
                             ",f.[City],f.[State],f.[Zip],f.[Lat],f.[Lng],f.[Notes],s.[schedule_ID], "+
-                            "t.[Sports_Name],t.[Sports_Icon] "+
+                            "s.[Schedule_DateTime],t.[Sports_Name],t.[Sports_Icon] "+
                             "FROM [schedule] s "+
                             "JOIN facility as f on f.Facility_ID = s.Facility_ID "+
                             "JOIN SportsType as t on t.SportsType_ID = s.SportsType_ID "+
@@ -76,18 +84,27 @@ public class dbGetMySchedulesMarkers extends AsyncTask<UserBounds,String,List<Ma
                 MarkerOptions mo;
 
                 while (rs.next()) {
-                    String n = rs.getString("fName") + " - " + rs.getString("Sports_Name");
+                    String n = rs.getString("fName");
+                    Date d = rs.getDate("Schedule_DateTime");
+                    DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm aa");
+                    String ds = dateFormat.format(d);
+                    String s = rs.getString("Sports_Name") + " - " +  ds;
+
                     LatLng LL = new LatLng(rs.getDouble("Lat"),rs.getDouble("Lng"));
-                    Blob bl = rs.getBlob("Sports_Icon");
                     mo = new MarkerOptions();
                     mo.title(n);
+                    mo.snippet(s);
                     mo.position(LL);
-                    if(bl != null) {
-                        int i = (int) bl.length();
-                        byte[] blAsBytes = bl.getBytes(1, i);
-                        Bitmap bm = BitmapFactory.decodeByteArray(blAsBytes, 0, blAsBytes.length);
-                        mo.icon(BitmapDescriptorFactory.fromBitmap(bm));
+
+                    Resources resources = mContext.getResources();
+                    final int resourcesID = resources.getIdentifier(rs.getString("Sports_Name").toLowerCase(),"drawable",
+                            mContext.getPackageName());
+                    if(resourcesID > 0){
+                        Bitmap bitmap = BitmapFactory.decodeResource(resources,resourcesID);
+                        mo.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
                     }
+
+
                     markersOList.add(mo);
                 }
 

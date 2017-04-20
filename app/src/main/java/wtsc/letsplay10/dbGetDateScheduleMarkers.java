@@ -1,6 +1,8 @@
 package wtsc.letsplay10;
 
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -25,8 +27,12 @@ public class dbGetDateScheduleMarkers extends AsyncTask<DateTimeBounds,String,Li
 
     private dbConnectionClass connectionClass;
     private OnScheduleDataLoaded dataLoaded;
+    private Context mContext;
 
-    public dbGetDateScheduleMarkers(OnScheduleDataLoaded activityContext){this.dataLoaded = activityContext;}
+    public dbGetDateScheduleMarkers(OnScheduleDataLoaded activityContext, Context context){
+        this.dataLoaded = activityContext;
+        mContext = context;
+    }
 
     @Override
     protected void onPreExecute() {
@@ -85,12 +91,15 @@ public class dbGetDateScheduleMarkers extends AsyncTask<DateTimeBounds,String,Li
                     mo = new MarkerOptions();
                     mo.title(n);
                     mo.position(LL);
-                    if(bl != null) {
-                        int i = (int) bl.length();
-                        byte[] blAsBytes = bl.getBytes(1, i);
-                        Bitmap bm = BitmapFactory.decodeByteArray(blAsBytes, 0, blAsBytes.length);
-                        mo.icon(BitmapDescriptorFactory.fromBitmap(bm));
+
+                    Resources resources = mContext.getResources();
+                    final int resourcesID = resources.getIdentifier(rs.getString("Sports_Name").toLowerCase(),"drawable",
+                            mContext.getPackageName());
+                    if(resourcesID > 0){
+                        Bitmap bitmap = BitmapFactory.decodeResource(resources,resourcesID);
+                        mo.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
                     }
+
                     markersOList.add(mo);
                 }
             }

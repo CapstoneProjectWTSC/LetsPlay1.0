@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements
     private Date bDateTime, eDateTime;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements
  //       editor.commit();
 //------------------------------------------------------------------------------------------
         String json = preferences.getString("User", "");
-              json="";
+    //          json="";
         if (json.equals("")) {
             startActivityForResult(new Intent(getApplicationContext(), SignIn.class ),1);
         }
@@ -322,21 +323,21 @@ public class MainActivity extends AppCompatActivity implements
         if(!selectedPlaceMarkerShowing) {
             switch (markerFiltersType){
                 case "MY_SCHEDULES":
-                    dbGetMySchedulesMarkers mySchedules = new dbGetMySchedulesMarkers(MainActivity.this);
+                    dbGetMySchedulesMarkers mySchedules = new dbGetMySchedulesMarkers(MainActivity.this, this);
                     mySchedules.execute(new UserBounds(currentUser,curBounds));
                     break;
                 case "ALL_SCHEDULES":
-                    dbGetAllSchedules allSchedules = new dbGetAllSchedules(MainActivity.this);
+                    dbGetAllSchedules allSchedules = new dbGetAllSchedules(MainActivity.this, this );
                     allSchedules.execute(new UserBounds(currentUser,curBounds));
                     break;
                 case "DATE_TIME":
                     isDialogReturn = true;
-                    dbGetDateScheduleMarkers dateSchedules = new dbGetDateScheduleMarkers(MainActivity.this);
+                    dbGetDateScheduleMarkers dateSchedules = new dbGetDateScheduleMarkers(MainActivity.this, this);
                     dateSchedules.execute(new DateTimeBounds(bDateTime,eDateTime,curBounds));
                     break;
                 case "SPORTS_TYPE":
                     isDialogReturn = true;
-                    dbGetSportTypeScheduleMarkers sportsTypeSchedules = new dbGetSportTypeScheduleMarkers(MainActivity.this);
+                    dbGetSportTypeScheduleMarkers sportsTypeSchedules = new dbGetSportTypeScheduleMarkers(MainActivity.this, this);
                     sportsTypeSchedules.execute(new SportsBounds(selectedSportType,curBounds));
                     break;
                 default:
