@@ -17,7 +17,7 @@
     <string name="add_facility">Add Facility</string>
     <string name="my_schedules">My Schedules</string>
     <string name="sports_type">Sports Type</string>
-    <string name="date_n_times">Date &amp; Times</string>
+    <string name="date_n_times">Date</string>
     <string name="view_all">All Schedules</string>
 
 </resources>
