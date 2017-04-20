@@ -184,17 +184,19 @@ public class AddFacility extends AppCompatActivity implements
                         }
                     }
 
-
                 break;
+
             case R.id.addFromMap:
-                startActivity(new Intent(getApplicationContext(),AddFromMap.class));
+                startActivity(new Intent(getApplicationContext(), AddFromMap.class));
                 this.latitude = addFromMapLatLng.latitude;
                 this.longitude = addFromMapLatLng.longitude;
+
                 try {
                     findLocationInformation();
                 } catch (IOException IOE) {
                     IOE.printStackTrace();
                 }
+
                 break;
         }
     }

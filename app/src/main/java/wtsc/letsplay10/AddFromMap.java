@@ -41,9 +41,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 
 
 public class AddFromMap extends AppCompatActivity implements
@@ -75,7 +72,11 @@ public class AddFromMap extends AppCompatActivity implements
     private boolean isDialogReturn;
     private String bDateText, eDateText;
 
-
+    /**
+     * This class is made to complement the AddFacility class. When the "Select from map" button is clicked on that page, this page is displayed. It's
+     * functionally the same as the MainActivity Class, but with some changes to support the AddFacility class.
+     * We could probably implement this class into that one, but for now, this is what I've created.
+     */
 
 
     @Override
@@ -173,9 +174,6 @@ public class AddFromMap extends AppCompatActivity implements
     public void onError(Status status) {
         // TODO: Handle the error.
    }
-
-
-
 
     @Override
     public void onPause() {
