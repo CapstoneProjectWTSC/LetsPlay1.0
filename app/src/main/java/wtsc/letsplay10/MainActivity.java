@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements
     private List<MarkerOptions> showMarkerOpList;
     private final static LatLng WTSC_POS = new LatLng(35.651143, -78.704099);
     private int currentZoomLevel;
+    private boolean isHybrid;
     private boolean selectedPlaceMarkerShowing;
     private String markerFiltersType;
     private User currentUser;
@@ -81,12 +82,14 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        currentZoomLevel = 12;
+        currentZoomLevel = 10;
+        isHybrid = false;
         selectedPlaceMarkerShowing = false;
 
         buildGoogleApiClient();
@@ -184,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements
             local.setLongitude(savedInstanceState.getFloat("Location_LNG"));
             mLastLocation.set(local);
         }
+        isHybrid = savedInstanceState.getBoolean("IS_HYBRID");
      }
 
     @Override
@@ -228,6 +232,21 @@ public class MainActivity extends AppCompatActivity implements
                 startActivity(addFacIntent);
                 return true;
 
+            case R.id.isHybridCheckBox:
+                if(item.isChecked()){
+                    item.setChecked(false);
+                    isHybrid = false;
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+                }else {
+                    item.setChecked(true);
+                    isHybrid = true;
+                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                }
+                SharedPreferences.Editor prefsEditor = preferences.edit();
+                prefsEditor.putBoolean("IS_HYBRID", isHybrid);
+                prefsEditor.commit();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -287,6 +306,8 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.toolbar_menu , menu);
+        MenuItem item = menu.findItem(R.id.isHybridCheckBox);
+        item.setChecked(isHybrid);
         return true;
     }
 
@@ -295,7 +316,12 @@ public class MainActivity extends AppCompatActivity implements
         mMap = map;
         mMap.setOnCameraIdleListener(this);
         mMap.setOnMarkerClickListener(this);
-        map.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        if(isHybrid){
+            mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        }else {
+            mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        }
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkLocationPermission()) {
