@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements
                     mySchedules.execute(new UserBounds(currentUser,curBounds));
                     break;
                 case "ALL_SCHEDULES":
-                    dbGetAllSchedules allSchedules = new dbGetAllSchedules(MainActivity.this, this );
+                    dbGetAllSchedulesMarkers allSchedules = new dbGetAllSchedulesMarkers(MainActivity.this, this );
                     allSchedules.execute(new UserBounds(currentUser,curBounds));
                     break;
                 case "DATE_TIME":
