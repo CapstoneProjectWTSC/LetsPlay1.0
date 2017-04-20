@@ -148,6 +148,13 @@ public class AddFromMap extends AppCompatActivity implements
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, currentZoomLevel));
         selectedPlaceMarkerShowing = true;
 
+            /**
+             * This is the code that is different from the MainActivity class.
+             * It is a simple dialogue box that will be sure that a user wants to add this facility
+             * We could probably alter this later, if we don't want to use a dialogue box, but it'll
+             * work for now.
+             */
+
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -164,8 +171,8 @@ public class AddFromMap extends AppCompatActivity implements
                 }
             });
 
-            AlertDialog alert = builder.create();
-            alert.show();
+            AlertDialog addFacilityAlert = builder.create();
+            addFacilityAlert.show();
 
 
     }
