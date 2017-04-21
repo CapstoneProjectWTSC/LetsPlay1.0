@@ -40,7 +40,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
-
+import static wtsc.letsplay10.R.id.map;
 
 
 public class AddFromMap extends AppCompatActivity implements
@@ -69,6 +69,7 @@ public class AddFromMap extends AppCompatActivity implements
     private String markerFiltersType;
     private User currentUser;
     private boolean isDialogReturn;
+
 
     /**
      * This class is made to complement the AddFacility class. When the "Select from map" button is clicked on that page, this page is displayed. It's
