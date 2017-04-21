@@ -5,13 +5,14 @@
     android:id="@+id/add_schedule_tableLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:stretchColumns="1"
+    android:layout_centerInParent="true"
+    android:background="@drawable/football_background"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:layout_centerInParent="true"
 
+    android:stretchColumns="1"
     tools:context="wtsc.letsplay10.Introduction">
 
 
@@ -99,7 +100,7 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1" >
+                android:layout_weight="1">
 
                 <TextView
                     android:id="@+id/findOnMapTxt"
@@ -163,7 +164,8 @@
 
     <TableRow
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
+
         <EditText
             android:id="@+id/dateText"
             android:layout_width="wrap_content"
@@ -171,11 +173,11 @@
             android:ems="10"
             android:hint="Date mm/dd/yy"
             android:inputType="date" />
-     </TableRow>
+    </TableRow>
 
     <TableRow
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
 
         <EditText
@@ -184,7 +186,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Time 03:00pm"
-            android:inputType="time" />
+            android:inputType="text|textAutoComplete" />
 
 
     </TableRow>
