@@ -20,13 +20,7 @@
             android:layout_height="wrap_content"
             android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
             />
-  <!--       <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/searchTxtBx"
-                android:background="?attr/colorPrimaryDark"
-                />
-        -->
+
     </android.support.v7.widget.Toolbar>
 
     <!-- Layout for content is here. This can be a RelativeLayout  -->
@@ -44,21 +38,11 @@
         android:orientation="vertical"
         tools:context="wtsc.letsplay10.MainActivity">
 
-  <!--      <include
-            android:id="@+id/menu_bar"
-            layout="@layout/menu_tool_bar"/>
-            -->
-
-
-
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             class="com.google.android.gms.maps.SupportMapFragment" />
-
-
-
 
     </RelativeLayout>
 </LinearLayout>
