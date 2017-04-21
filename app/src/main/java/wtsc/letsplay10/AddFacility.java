@@ -1,7 +1,6 @@
 package wtsc.letsplay10;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,19 +18,10 @@ import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnCameraIdleListener;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,15 +33,11 @@ import java.util.Locale;
 public class AddFacility extends AppCompatActivity implements
         OnClickListener, LocationListener, OnNewFacilityAdded, OnCheckedChangeListener {
 
-    private Facility newFacility;
     private double latitude;
     private double longitude;
     public static LatLng addFromMapLatLng;
     dbAddNewFacility db_AddNewFacility;
-    dbGetFacilitiesList db_GetFacilitiesList;
     private Location mLastLocation;
-    private Boolean addressButtonChecked;
-    private Boolean clButtonChecked;
 
     private EditText FacilityNameText2;     //top one for current location
     private EditText FacilityNameText;      //bottom one for find by address
@@ -103,9 +88,12 @@ public class AddFacility extends AppCompatActivity implements
 
     }
 
-    //run this if user selects to add facility based on current location
+    /**
+     * Finds the location information of a potential new facility using the latitude and longitude,
+     * then calls the addToDatabase method.
+     */
 
-    public void findLocationInformation() throws IOException {
+    public void findLocationInfo() throws IOException {
         Geocoder geocoder;
         List<Address> addressInformation;
         geocoder = new Geocoder(this, Locale.getDefault());
@@ -121,32 +109,34 @@ public class AddFacility extends AppCompatActivity implements
         String name = FacilityNameText2.getText().toString();
         String notes = "";
 
-        db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
-
-        db_AddNewFacility.execute(name, address1, address2,city, state, zip, Double.toString(latitude),
-                Double.toString(longitude), notes);
+        addToDatabase(name, address1, address2, city, state, zip, notes);
 
     }
 
 
-    //run this if add by address is selected.  Adds info using data gathered from user
+    /**
+     * Reads the information from the EditText fields into variables and then passes them to the addToDatabase method.
+     */
 
-    public void addLocationInformation() throws IOException {
+    public void readUserInput() throws IOException {
 
+        String name = FacilityNameText.getText().toString();
         String address1 = AddressText.getText().toString();
         String address2 = "";
         String city = CityText.getText().toString();
         String state = StateText.getText().toString();
         String zip = ZipText.getText().toString();
-        String name = FacilityNameText.getText().toString();
         String notes = "";
 
+        addToDatabase(name, address1, address2, city, state, zip, notes);
+    }
+
+    public void addToDatabase(String name, String address1, String address2, String city, String state, String zip, String notes)
+    {
         db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
 
-        db_AddNewFacility.execute(name, address1, address2,city, state, zip, Double.toString(latitude),
-                 Double.toString(longitude), notes);
-
-
+        db_AddNewFacility.execute(name, address1, address2, city, state, zip, Double.toString(latitude),
+                Double.toString(longitude), notes);
     }
 
 
@@ -157,6 +147,10 @@ public class AddFacility extends AppCompatActivity implements
                 {
      */
 
+    /**
+     * On click listener that listens fro a click on the submit button or the select from map button;
+     * the relevant procedure is then executed.
+     */
     public void onClick (View v) {
         int selectedId = rBGroup.getCheckedRadioButtonId();
 
@@ -169,7 +163,7 @@ public class AddFacility extends AppCompatActivity implements
                         this.latitude = mLastLocation.getLatitude();
                         this.longitude = mLastLocation.getLongitude();
                         try {
-                            findLocationInformation();
+                            findLocationInfo();
                         } catch (IOException IOE) {
                             IOE.printStackTrace();
                         }
@@ -178,7 +172,7 @@ public class AddFacility extends AppCompatActivity implements
                     else if (selectedId == R.id.addressButton)
                     {
                         try {
-                            addLocationInformation();
+                            readUserInput();
                         } catch (IOException IOE) {
                             IOE.printStackTrace();
                         }
@@ -192,7 +186,7 @@ public class AddFacility extends AppCompatActivity implements
                 this.longitude = addFromMapLatLng.longitude;
 
                 try {
-                    findLocationInformation();
+                    findLocationInfo();
                 } catch (IOException IOE) {
                     IOE.printStackTrace();
                 }
@@ -200,6 +194,11 @@ public class AddFacility extends AppCompatActivity implements
                 break;
         }
     }
+
+    /**
+     * Listener that determines which radio button was checked. A message is then displayed for
+     * the corresponding button.
+     */
 
     @Override
     public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
@@ -217,6 +216,9 @@ public class AddFacility extends AppCompatActivity implements
         }
     }
 
+    /**
+     * When a new facility is added, a message is displayed, and the MainActivity class is loaded.
+     */
     @Override
     public void onDBNewFacilityAdded(Facility NewFacility) {
         String name = NewFacility.getName();

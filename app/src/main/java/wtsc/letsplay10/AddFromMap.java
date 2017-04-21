@@ -68,9 +68,7 @@ public class AddFromMap extends AppCompatActivity implements
     private boolean selectedPlaceMarkerShowing;
     private String markerFiltersType;
     private User currentUser;
-    private Sport selectedSportType;
     private boolean isDialogReturn;
-    private String bDateText, eDateText;
 
     /**
      * This class is made to complement the AddFacility class. When the "Select from map" button is clicked on that page, this page is displayed. It's
@@ -82,7 +80,7 @@ public class AddFromMap extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.add_by_map);
 
         currentZoomLevel = 12;
         selectedPlaceMarkerShowing = false;
