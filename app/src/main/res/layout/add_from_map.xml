@@ -58,7 +58,16 @@
             class="com.google.android.gms.maps.SupportMapFragment" />
 
 
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
+        <android.support.design.widget.CoordinatorLayout
+            android:id="@+id/snackbarCoordinatorLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.design.widget.CoordinatorLayout>
 
     </RelativeLayout>
 </LinearLayout>
