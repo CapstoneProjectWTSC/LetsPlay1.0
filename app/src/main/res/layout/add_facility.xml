@@ -26,7 +26,16 @@
             android:textSize="30dp" />
     </TableRow>
 
-    <TableRow></TableRow>
+
+    <TableRow>
+
+        <TextView
+            android:id="@+id/currentLocationTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:text="Lat: Lng:" />
+    </TableRow>
 
     <RadioGroup
         android:id="@+id/RGroup"
@@ -40,63 +49,6 @@
             android:layout_height="wrap_content"
             android:text="Use Current Location" />
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <TextView
-                android:id="@+id/currentLocationTxt"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Lat: Lng:" />
-        </TableRow>
-
-        <EditText
-            android:id="@+id/FacilityNameText2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Facility Name"
-            android:inputType="textPersonName"
-            android:paddingTop="10dp" />
-        <!--
-    <TableRow>
-
-        <EditText
-            android:id="@+id/LatText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Latitude:" />
-    </TableRow>
-    <TableRow>
-
-        <EditText
-            android:id="@+id/LonText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:paddingTop="10dp"
-            android:inputType="textPersonName"
-            android:text="Longitude:" />
-    </TableRow>
-
-    <TextView
-         />
-         -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_span="2"
-            android:gravity="center"
-            android:lineSpacingMultiplier="1.2"
-            android:text="Or"
-            android:textSize="20dp" />
-
-
         <RadioButton
             android:id="@+id/addressButton"
             android:layout_width="wrap_content"
@@ -104,10 +56,38 @@
             android:text="Add By Address" />
     </RadioGroup>
 
-    <TextView />
+    <TableRow android:paddingTop="5dp">
+
+ <!--       <EditText
+            android:id="@+id/FacilityNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Facility Name"
+            android:inputType="textPersonName"
+            android:paddingTop="10dp" />
+        <fragment
+            android:id="@+id/add_facility_place_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            />  -->
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Please enter your place" >
+
+            <requestFocus />
+        </AutoCompleteTextView>
+
+    </TableRow>
+
+
 
     <TableRow>
-
         <EditText
             android:id="@+id/AddressText"
             android:layout_width="wrap_content"
@@ -119,7 +99,6 @@
     </TableRow>
 
     <TableRow>
-
         <EditText
             android:id="@+id/CityText"
             android:layout_width="wrap_content"
@@ -154,22 +133,12 @@
             android:paddingTop="5dp" />
     </TableRow>
 
-    <TableRow>
-
-        <EditText
-            android:id="@+id/FacilityNameText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Facility Name"
-            android:inputType="textPersonName"
-            android:paddingTop="10dp" />
-    </TableRow>
 
     <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="5dp">
 
         <Button
             android:id="@+id/submitButton"

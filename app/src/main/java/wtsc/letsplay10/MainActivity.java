@@ -85,56 +85,75 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        try {
 
-        currentZoomLevel = 10;
-        isHybrid = false;
-        selectedPlaceMarkerShowing = false;
 
-        buildGoogleApiClient();
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
 
-        toolbar = (Toolbar) findViewById(R.id.menu_bar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayUseLogoEnabled(true);
-        getSupportActionBar().setLogo(R.drawable.lets_play_icon6);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        isDialogReturn = false;
-        bDateTime = new Date();
-        eDateTime = new Date();
+            preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
+            // Load user preferences
 
-        markerFiltersType = "MY_SCHEDULES";
-        preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
-
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-
-        autocompleteFragment.setOnPlaceSelectedListener(this);
-        autocompleteFragment.setHint("Find Location");
-
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
-        mapFragment.getMapAsync(this);
-
-// ---------------------------for testing -----------------------------------------------
-  //      SharedPreferences.Editor editor = preferences.edit();
-  //      editor.clear();
- //       editor.commit();
+            // ---------------------------for testing -----------------------------------------------
+            //      SharedPreferences.Editor editor = preferences.edit();
+            //      editor.clear();
+            //       editor.commit();
 //------------------------------------------------------------------------------------------
-        String json = preferences.getString("User", "");
-    //          json="";
-        if (json.equals("")) {
-            startActivityForResult(new Intent(getApplicationContext(), SignIn.class ),1);
+
+
+            String json = preferences.getString("User", "");
+            //          json="";
+            // Check if user is signed in - if not start sign activity
+            if (json.equals("")) {
+                startActivityForResult(new Intent(getApplicationContext(), SignIn.class), 1);
+            }
+            // Get saved user class
+            currentUser = new User();
+            Gson gson = new Gson();
+            currentUser = gson.fromJson(json, User.class);
+            // Set map tpye preference
+            isHybrid = preferences.getBoolean("IS_HYBRID", false);
+
+
+            // Load class variables
+            currentZoomLevel = 10;
+            isHybrid = false;
+            selectedPlaceMarkerShowing = false;
+            buildGoogleApiClient();
+            mLocationRequest = new LocationRequest();
+            mLocationRequest.setInterval(1000);
+            mLocationRequest.setFastestInterval(1000);
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            isDialogReturn = false;
+            bDateTime = new Date();
+            eDateTime = new Date();
+            markerFiltersType = "MY_SCHEDULES";
+
+            // Set up toolbar
+            toolbar = (Toolbar) findViewById(R.id.menu_bar);
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayUseLogoEnabled(true);
+            getSupportActionBar().setLogo(R.drawable.lets_play_icon6);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+            // Declare & setup Google Places fragment
+            PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                    getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+            autocompleteFragment.setOnPlaceSelectedListener(this);
+            autocompleteFragment.setHint("Find Location");
+
+            // Declare main activity's map fragment
+            SupportMapFragment mapFragment =
+                    (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
+            mapFragment.getMapAsync(this);
         }
-        currentUser = new User();
-        Gson gson = new Gson();
-        currentUser = gson.fromJson(json, User.class);
-        isHybrid = preferences.getBoolean("IS_HYBRID",false);
+        catch (Exception ex){
+            String message = ex.getMessage().toString();
+            Snackbar invalidbDate = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+            invalidbDate.show();
+        }
+
     }
 
 
