@@ -99,7 +99,7 @@ public class dbGetDateScheduleMarkers extends AsyncTask<DateTimeBounds,String,Li
                     mo.position(LL);
 
                     Resources resources = mContext.getResources();
-                    final int resourcesID = resources.getIdentifier(rs.getString("Sports_Name").toLowerCase(),"drawable",
+                    final int resourcesID = resources.getIdentifier(rs.getString("Sports_Name").toLowerCase().replace(" ",""),"drawable",
                             mContext.getPackageName());
                     if(resourcesID > 0){
                         Bitmap bitmap = BitmapFactory.decodeResource(resources,resourcesID);
