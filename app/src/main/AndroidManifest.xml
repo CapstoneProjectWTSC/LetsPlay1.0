@@ -44,6 +44,9 @@
         <activity android:name=".AddFacility">
         </activity>
 
+        <activity android:name=".AddFromMap">
+        </activity>
+
 </application>
 
 </manifest>

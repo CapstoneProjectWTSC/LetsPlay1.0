@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.DialogInterface;
 import android.app.AlertDialog;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,8 +18,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -40,6 +40,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import static wtsc.letsplay10.R.id.map;
 
 
@@ -51,7 +55,8 @@ public class AddFromMap extends AppCompatActivity implements
         GoogleMap.OnMapClickListener,
         OnMapReadyCallback,
         OnCameraIdleListener,
-        PlaceSelectionListener {
+        PlaceSelectionListener,
+        OnNewFacilityAdded {
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -67,8 +72,12 @@ public class AddFromMap extends AppCompatActivity implements
     private int currentZoomLevel;
     private boolean selectedPlaceMarkerShowing;
     private String markerFiltersType;
+    private String nameFromUser;
+    private dbAddNewFacility db_AddNewFacility;
     private User currentUser;
     private boolean isDialogReturn;
+    private double latitude;
+    private double longitude;
 
 
     /**
@@ -81,7 +90,7 @@ public class AddFromMap extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_by_map);
+        setContentView(R.layout.add_from_map);
 
         currentZoomLevel = 12;
         selectedPlaceMarkerShowing = false;
@@ -118,14 +127,7 @@ public class AddFromMap extends AppCompatActivity implements
   //      editor.clear();
  //       editor.commit();
 //------------------------------------------------------------------------------------------
-        String json = preferences.getString("User", "");
-              json="";
-        if (json.equals("")) {
-            startActivityForResult(new Intent(getApplicationContext(), SignIn.class ),1);
-        }
-        currentUser = new User();
-        Gson gson = new Gson();
-        currentUser = gson.fromJson(json, User.class);
+
 
     }
 
@@ -139,6 +141,8 @@ public class AddFromMap extends AppCompatActivity implements
 //        autocompleteFragment.
         selectedPlace = place;
         final LatLng selectedLatLng = selectedPlace.getLatLng();
+            this.latitude = selectedLatLng.latitude;
+            this.longitude = selectedLatLng.longitude;
 
         Marker selectedMarker = mMap.addMarker(new MarkerOptions()
                                     .position(selectedLatLng)
@@ -156,9 +160,18 @@ public class AddFromMap extends AppCompatActivity implements
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            builder.setMessage("Would you like to add this facility?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    AddFacility.addFromMapLatLng = selectedLatLng;
+                    try {
+                        findLocationInfo();
+                    } catch (IOException IOE)
+                    {
+                        IOE.printStackTrace();
+                    }
+
+                    nameFromUser = " "; // for testing purposes, the nameFromUser should actually be supplied by the user.
+
                     dialog.dismiss();
                     finish();
                 }
@@ -386,5 +399,45 @@ public class AddFromMap extends AppCompatActivity implements
             // other 'case' lines to check for other permissions this app might request.
             //You can add here other case statements according to your requirement.
         }
+    }
+
+    public void findLocationInfo() throws IOException {
+        Geocoder geocoder;
+        List<Address> addressInformation;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        addressInformation = geocoder.getFromLocation(this.latitude, this.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+
+        String address1 = addressInformation.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+        String address2 = "";
+        String city = addressInformation.get(0).getLocality();
+        String[] spState = addressInformation.get(0).getAddressLine(1).split(" ");
+        String state = spState[1];
+        String zip = addressInformation.get(0).getPostalCode();
+        String name = nameFromUser;
+        String notes = "";
+
+        addToDatabase(name, address1, address2, city, state, zip, notes);
+
+    }
+
+    public void addToDatabase(String name, String address1, String address2, String city, String state, String zip, String notes)
+    {
+        db_AddNewFacility = new dbAddNewFacility(AddFromMap.this);
+
+        db_AddNewFacility.execute(name, address1, address2, city, state, zip, Double.toString(latitude),
+                Double.toString(longitude), notes);
+    }
+
+    /**
+     * When a new facility is added, a message is displayed, and the MainActivity class is loaded.
+     */
+    @Override
+    public void onDBNewFacilityAdded(Facility NewFacility) {
+        String name = NewFacility.getName();
+        String message = "The facility " + name + " successfully added!";
+        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+        facilityAddedSnackbar.show();
+        startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }
 }

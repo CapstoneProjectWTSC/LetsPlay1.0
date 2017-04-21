@@ -50,6 +50,7 @@ public class AddFacility extends AppCompatActivity implements
     private RadioButton addressButton;      //find by address button
     private RadioGroup rBGroup;
     private Button createFacilityButton;    //button at bottom to create facility
+    private Button addFromMapButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,9 @@ public class AddFacility extends AppCompatActivity implements
 
         createFacilityButton = (Button) findViewById(R.id.submitButton);
         createFacilityButton.setOnClickListener(this);
+
+        addFromMapButton = (Button) findViewById(R.id.addFromMap);
+        addFromMapButton.setOnClickListener(this);
     }
 
     @Override
@@ -182,15 +186,6 @@ public class AddFacility extends AppCompatActivity implements
 
             case R.id.addFromMap:
                 startActivity(new Intent(getApplicationContext(), AddFromMap.class));
-                this.latitude = addFromMapLatLng.latitude;
-                this.longitude = addFromMapLatLng.longitude;
-
-                try {
-                    findLocationInfo();
-                } catch (IOException IOE) {
-                    IOE.printStackTrace();
-                }
-
                 break;
         }
     }

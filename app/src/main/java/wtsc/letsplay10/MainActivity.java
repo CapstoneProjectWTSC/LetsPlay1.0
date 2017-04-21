@@ -150,8 +150,8 @@ public class MainActivity extends AppCompatActivity implements
         Marker selectedMarker = mMap.addMarker(new MarkerOptions()
                                     .position(selectedLatLng)
                                     .title(selectedPlace.getName().toString()));
-        selectedMarker.showInfoWindow();;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, currentZoomLevel));
+        selectedMarker.showInfoWindow();
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, currentZoomLevel));
         selectedPlaceMarkerShowing = true;
     }
 
