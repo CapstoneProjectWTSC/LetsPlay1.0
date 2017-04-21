@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements
         currentUser = new User();
         Gson gson = new Gson();
         currentUser = gson.fromJson(json, User.class);
-
+        isHybrid = preferences.getBoolean("IS_HYBRID",false);
     }
 
 
@@ -162,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-
     @Override
     public void onPause() {
         super.onPause();
@@ -170,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements
             SharedPreferences.Editor prefsEditor = preferences.edit();
             prefsEditor.putFloat("Location_LAT", (float) mLastLocation.getLatitude());
             prefsEditor.putFloat("Location_LNG", (float) mLastLocation.getLongitude());
+            prefsEditor.putBoolean("IS_HYBRID",isHybrid);
             prefsEditor.commit();
         }
     }
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements
             local.setLongitude(savedInstanceState.getFloat("Location_LNG"));
             mLastLocation.set(local);
         }
-        isHybrid = savedInstanceState.getBoolean("IS_HYBRID");
+        isHybrid = preferences.getBoolean("IS_HYBRID",false);
      }
 
     @Override
@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements
                 }else {
                     item.setChecked(true);
                     isHybrid = true;
-                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID );
                 }
                 SharedPreferences.Editor prefsEditor = preferences.edit();
                 prefsEditor.putBoolean("IS_HYBRID", isHybrid);
