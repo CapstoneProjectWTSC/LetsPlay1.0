@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.EditText;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -151,40 +152,7 @@ public class AddFromMap extends AppCompatActivity implements
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, currentZoomLevel));
         selectedPlaceMarkerShowing = true;
 
-            /**
-             * This is the code that is different from the MainActivity class.
-             * It is a simple dialogue box that will be sure that a user wants to add this facility
-             * We could probably alter this later, if we don't want to use a dialogue box, but it'll
-             * work for now.
-             */
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-            builder.setMessage("Would you like to add this facility?")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    try {
-                        findLocationInfo();
-                    } catch (IOException IOE)
-                    {
-                        IOE.printStackTrace();
-                    }
-
-                    nameFromUser = " "; // for testing purposes, the nameFromUser should actually be supplied by the user.
-
-                    dialog.dismiss();
-                    finish();
-                }
-            });
-            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    // User cancelled the dialog
-                    dialog.dismiss();
-                }
-            });
-
-            AlertDialog addFacilityAlert = builder.create();
-            addFacilityAlert.show();
 
 
     }
@@ -252,6 +220,56 @@ public class AddFromMap extends AppCompatActivity implements
     @Override
     public boolean onMarkerClick(final Marker marker) {
         lastMarkerClicked = marker;
+        /**
+         * This is the code that is different from the MainActivity class.
+         * It is a simple dialogue box that will be sure that a user wants to add this facility
+         * We could probably alter this later, if we don't want to use a dialogue box, but it'll
+         * work for now.
+         */
+
+        final AlertDialog.Builder locationNameBuilder = new AlertDialog.Builder(this);
+        locationNameBuilder.setTitle("Please enter in a name for this facility:");
+
+        final EditText input = new EditText(this);
+
+        locationNameBuilder.setView(input);
+
+        locationNameBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                nameFromUser = input.getText().toString();
+                try {
+                    findLocationInfo();
+                } catch (IOException IOE)
+                {
+                    IOE.printStackTrace();
+                }
+            }
+        });
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("Would you like to add this facility?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        locationNameBuilder.show();
+                        dialog.dismiss();
+
+
+
+                    }
+                });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog addFacilityAlert = builder.create();
+        addFacilityAlert.show();
+
         return false;
     }
 //==================================================================================================================
