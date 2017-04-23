@@ -102,9 +102,9 @@ public class AddFacility extends AppCompatActivity implements
         List<Address> addressInformation;
         geocoder = new Geocoder(this, Locale.getDefault());
 
-        addressInformation = geocoder.getFromLocation(this.latitude, this.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        addressInformation = geocoder.getFromLocation(this.latitude, this.longitude, 1);
 
-        String address1 = addressInformation.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+        String address1 = addressInformation.get(0).getAddressLine(0);
         String address2 = "";
         String city = addressInformation.get(0).getLocality();
         String[] spState = addressInformation.get(0).getAddressLine(1).split(" ");

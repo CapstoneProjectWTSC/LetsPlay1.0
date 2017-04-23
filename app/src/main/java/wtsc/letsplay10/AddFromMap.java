@@ -48,6 +48,13 @@ import java.util.Locale;
 import static wtsc.letsplay10.R.id.map;
 
 
+
+/**
+ * The AddFromMap class is a function of AddFacility. It allows the user to
+ * select a pin from the map and add that location as a facility that way.
+ */
+
+
 public class AddFromMap extends AppCompatActivity implements
         LocationListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -79,14 +86,6 @@ public class AddFromMap extends AppCompatActivity implements
     private boolean isDialogReturn;
     private double latitude;
     private double longitude;
-
-
-    /**
-     * This class is made to complement the AddFacility class. When the "Select from map" button is clicked on that page, this page is displayed. It's
-     * functionally the same as the MainActivity Class, but with some changes to support the AddFacility class.
-     * We could probably implement this class into that one, but for now, this is what I've created.
-     */
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +122,11 @@ public class AddFromMap extends AppCompatActivity implements
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
 
+        String message = "Search an address and/or click the marker to add a new facility";
+        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message,
+                Snackbar.LENGTH_LONG).setDuration(5000);
+        facilityAddedSnackbar.show();
+
 // ---------------------------for testing -----------------------------------------------
   //      SharedPreferences.Editor editor = preferences.edit();
   //      editor.clear();
@@ -135,11 +139,9 @@ public class AddFromMap extends AppCompatActivity implements
 
         @Override
     public void onPlaceSelected(Place place) {
-        // TODO: Get info about the selected place.
-       // String s = (String)place.getName();
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-//        autocompleteFragment.
+
         selectedPlace = place;
         final LatLng selectedLatLng = selectedPlace.getLatLng();
             this.latitude = selectedLatLng.latitude;
@@ -217,24 +219,41 @@ public class AddFromMap extends AppCompatActivity implements
         map.addMarker(new MarkerOptions().position(WTSC_POS).title("Wake Tech Software Corp"));
     }
 
+    /**
+     * This method handles the onClick event when a user clicks a marker. The marker is parsed for
+     * the location, and then a method is called to handle the dialogs.
+     */
     @Override
     public boolean onMarkerClick(final Marker marker) {
         lastMarkerClicked = marker;
-        /**
-         * This is the code that is different from the MainActivity class.
-         * It is a simple dialogue box that will be sure that a user wants to add this facility
-         * We could probably alter this later, if we don't want to use a dialogue box, but it'll
-         * work for now.
-         */
 
-        final AlertDialog.Builder locationNameBuilder = new AlertDialog.Builder(this);
-        locationNameBuilder.setTitle("Please enter in a name for this facility:");
+        final LatLng markerLatLng = lastMarkerClicked.getPosition();
+        this.latitude = markerLatLng.latitude;
+        this.longitude = markerLatLng.longitude;
+
+        displayDialogs();
+
+        return false;
+    }
+
+    //==================================================================================================================
+    /**
+     * This method builds and displays the dialog boxes for the user's marker click. If the user
+     * clicks yes to the confirmation dialog, a second dialog asking for the name of the facility
+     * is displayed.
+     */
+    public void displayDialogs()
+    {
+        //Creates the second dialog box that requests the name of the location
+        //-----------------------------------------------------------------------------------
+        final AlertDialog.Builder getLocationNameBuilder = new AlertDialog.Builder(this);
+        getLocationNameBuilder.setTitle("Please enter in a name for this facility:");
 
         final EditText input = new EditText(this);
 
-        locationNameBuilder.setView(input);
+        getLocationNameBuilder.setView(input);
 
-        locationNameBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        getLocationNameBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 nameFromUser = input.getText().toString();
@@ -248,29 +267,29 @@ public class AddFromMap extends AppCompatActivity implements
         });
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //Creates the first dialog box that confirms that the user wants to add this location
+        //-----------------------------------------------------------------------------------
+        AlertDialog.Builder confirmAddBuilder = new AlertDialog.Builder(this);
 
-        builder.setMessage("Would you like to add this facility?")
+        confirmAddBuilder.setMessage("Would you like to add this facility?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        locationNameBuilder.show();
+                        getLocationNameBuilder.show();
                         dialog.dismiss();
 
 
 
                     }
                 });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        confirmAddBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User cancelled the dialog
                 dialog.dismiss();
             }
         });
 
-        AlertDialog addFacilityAlert = builder.create();
-        addFacilityAlert.show();
-
-        return false;
+        AlertDialog confirmAddAlert = confirmAddBuilder.create();
+        confirmAddAlert.show();
     }
 //==================================================================================================================
     @Override
@@ -419,14 +438,17 @@ public class AddFromMap extends AppCompatActivity implements
         }
     }
 
+    /**
+     * This method uses the latitude and longitude of the marker to retrieve the location's information
+     */
     public void findLocationInfo() throws IOException {
         Geocoder geocoder;
         List<Address> addressInformation;
         geocoder = new Geocoder(this, Locale.getDefault());
 
-        addressInformation = geocoder.getFromLocation(this.latitude, this.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        addressInformation = geocoder.getFromLocation(this.latitude, this.longitude, 1);
 
-        String address1 = addressInformation.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+        String address1 = addressInformation.get(0).getAddressLine(0);
         String address2 = "";
         String city = addressInformation.get(0).getLocality();
         String[] spState = addressInformation.get(0).getAddressLine(1).split(" ");
@@ -436,9 +458,11 @@ public class AddFromMap extends AppCompatActivity implements
         String notes = "";
 
         addToDatabase(name, address1, address2, city, state, zip, notes);
-
     }
 
+    /**
+     * Method to add the new location to the database
+     */
     public void addToDatabase(String name, String address1, String address2, String city, String state, String zip, String notes)
     {
         db_AddNewFacility = new dbAddNewFacility(AddFromMap.this);
@@ -454,8 +478,11 @@ public class AddFromMap extends AppCompatActivity implements
     public void onDBNewFacilityAdded(Facility NewFacility) {
         String name = NewFacility.getName();
         String message = "The facility " + name + " successfully added!";
-        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
-        facilityAddedSnackbar.show();
+
+        // TODO: 4/23/2017 This SnackBar does not show up; it needs to be displayed either from the MainActivity class, or the program needs to wait to display it before initiating the MainActivityClass.
+        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message,
+                Snackbar.LENGTH_LONG);
+
         startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }
 }
