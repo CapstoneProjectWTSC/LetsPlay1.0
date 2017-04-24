@@ -3,6 +3,7 @@ package wtsc.letsplay10;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -22,12 +23,17 @@ public class Introduction extends AppCompatActivity
                     OndbFindEmail,
                     OnNewUserAdded{
 
+    private EditText firstNameSubmission;
+    private EditText lastNameSubmission;
     private EditText emailSubmission;
     private EditText usernameSubmission;
     private EditText passwordSubmission;
     private EditText passwordConfirmation;
     private Button confirm;
 
+
+    private String firstNameSubmissionString;
+    private String lastNameSubmissionString;
     private String emailSubmissionString;
     private String usernameSubmissionString;
     private String passwordSubmissionString;
@@ -40,6 +46,7 @@ public class Introduction extends AppCompatActivity
     private User currentUser = new User();
     private SharedPreferences preferences;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +55,15 @@ public class Introduction extends AppCompatActivity
         preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
         String json = preferences.getString("User", "");
 
+        firstNameSubmission= (EditText) findViewById(R.id.firstNameSubmission);
+        lastNameSubmission= (EditText) findViewById(R.id.lastNameSubmission);
         emailSubmission = (EditText) findViewById(R.id.emailSubmission);
         usernameSubmission = (EditText) findViewById(R.id.usernameSubmission);
         passwordSubmission = (EditText) findViewById(R.id.passwordSubmission);
         passwordConfirmation = (EditText) findViewById(R.id.passwordConfirmation);
 
+        firstNameSubmission.setOnKeyListener(this);
+        lastNameSubmission.setOnKeyListener(this);
         emailSubmission.setOnKeyListener(this);
         usernameSubmission.setOnKeyListener(this);
         passwordSubmission.setOnKeyListener(this);
@@ -73,6 +84,12 @@ public class Introduction extends AppCompatActivity
         {
             if (!event.isShiftPressed()) {
                 switch (view.getId()) {
+                    case R.id. firstNameSubmission:
+                        lastNameSubmission.requestFocus();
+                        break;
+                    case R.id. lastNameSubmission:
+                        emailSubmission.requestFocus();
+                        break;
                     case R.id.emailSubmission:
                         usernameSubmission.requestFocus();
                         break;
@@ -99,11 +116,12 @@ public class Introduction extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.confirm:
-                passwordSubmission.setError(null);
                 emailSubmissionString = emailSubmission.getText().toString();
                 usernameSubmissionString= usernameSubmission.getText().toString();
                 passwordSubmissionString= passwordSubmission.getText().toString();
                 passwordConfirmationString= passwordConfirmation.getText().toString();
+                firstNameSubmissionString= firstNameSubmission.getText().toString();
+                lastNameSubmissionString= lastNameSubmission.getText().toString();
 
                 db_findGameName = new dbFindGameName(Introduction.this);    //check if currentUser is in database
                 db_findGameName.execute(usernameSubmissionString);      // returns in onDBFindGameName
@@ -115,7 +133,9 @@ public class Introduction extends AppCompatActivity
     @Override
     public void onDBFindGameName(boolean isInDatabase) {
         if(isInDatabase){
-            // Error GameName already in database.
+            String message = "Username is already taken";
+            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signIn), message, Snackbar.LENGTH_SHORT);
+            invalidLogin.show();
         }
         else
         {
@@ -127,20 +147,30 @@ public class Introduction extends AppCompatActivity
     @Override
     public void onDBFindEmail(boolean isInDatabase) {
         if(isInDatabase){
-            // Error Email already in database
+            String message = "Email is already in use";
+            Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signIn), message, Snackbar.LENGTH_SHORT);
+            invalidLogin.show();
         }
         else
         {
-            // Email and GameName are available to use add new currentUser to database
-            currentUser.setEmail(emailSubmissionString);
-            currentUser.setGameName(usernameSubmissionString);
-            currentUser.setPassword(passwordSubmissionString);
-            currentUser.setFirstName("");
-            currentUser.setLastName("");
+            PasswordValidation passwordCheck = new PasswordValidation();
+            String message = passwordCheck.validateNewPass(passwordSubmissionString, passwordConfirmationString);
+            if(!message.equals("Success!"))
+            {
+                Snackbar invalidLogin = Snackbar.make(findViewById(R.id.signIn), message, Snackbar.LENGTH_SHORT);
+                invalidLogin.show();
+            }
+            else {
+                currentUser.setEmail(emailSubmissionString);
+                currentUser.setGameName(usernameSubmissionString);
+                currentUser.setPassword(passwordSubmissionString);
+                currentUser.setFirstName(firstNameSubmissionString);
+                currentUser.setLastName(lastNameSubmissionString);
 
-            db_addNewUser = new dbAddNewUser(Introduction.this);
-            db_addNewUser.execute(currentUser.getFirstName(), currentUser.getLastName(),
-                    currentUser.getGameName(), currentUser.getPassword(), currentUser.getEmail());
+                db_addNewUser = new dbAddNewUser(Introduction.this);
+                db_addNewUser.execute(currentUser.getFirstName(), currentUser.getLastName(),
+                        currentUser.getGameName(), currentUser.getPassword(), currentUser.getEmail());
+            }
         }
     }
 
