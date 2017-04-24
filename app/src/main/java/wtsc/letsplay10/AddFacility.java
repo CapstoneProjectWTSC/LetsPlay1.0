@@ -26,7 +26,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -237,7 +236,7 @@ public class AddFacility extends AppCompatActivity implements
         String[] spState = addressInformation.get(0).getAddressLine(1).split(" ");
         String state = spState[1];
         String zip = addressInformation.get(0).getPostalCode();
-        String name = FacilityNameText2.getText().toString();
+        String name = FacilityNameText.getText().toString();
         String notes = "";
 
         addToDatabase(name, address1, address2, city, state, zip, notes);
@@ -279,19 +278,27 @@ public class AddFacility extends AppCompatActivity implements
                 db_findFacility = new dbFindFacility(AddFacility.this);
                 db_findFacility.execute(FacilityNameText.getText().toString());
                 break;
+
+            case R.id.addFromMap:
+                startActivity(new Intent(getApplicationContext(), AddFromMap.class));
+                break;
+
+            case R.id.cancelButton:
+                finish();
+                break;
         }
     }
 
-                    if (selectedId == R.id.clButton)
-                    {
-                        this.latitude = mLastLocation.getLatitude();
-                        this.longitude = mLastLocation.getLongitude();
-                        try {
-                            findLocationInfo();
-                        } catch (IOException IOE) {
-                            IOE.printStackTrace();
-                        }
-                    }
+ //                   if (selectedId == R.id.clButton)
+   //                 {
+     //                   this.latitude = mLastLocation.getLatitude();
+       //                 this.longitude = mLastLocation.getLongitude();
+         //               try {
+           //                 findLocationInfo();
+             //           } catch (IOException IOE) {
+               //             IOE.printStackTrace();
+        //                }
+          //          }
     // Return from dbFindFacility validate if new facility name is not already used
     @Override
     public void onDBFindFacility(Facility NewFacility) {
@@ -308,7 +315,7 @@ public class AddFacility extends AppCompatActivity implements
                 }
             }
 
-                    else if (selectedId == R.id.addressButton)
+                    else if (selectedId == R.id.useAddressBTN)
                     {
                         try {
                             readUserInput();
@@ -336,11 +343,11 @@ public class AddFacility extends AppCompatActivity implements
         }
     }
 
-                break;
+  //              break;
 
-            case R.id.addFromMap:
-                startActivity(new Intent(getApplicationContext(), AddFromMap.class));
-                break;
+  //          case R.id.addFromMap:
+  //              startActivity(new Intent(getApplicationContext(), AddFromMap.class));
+  //              break;
     //run this if user selects to add facility based on current location
     public void findLocationInformation() throws IOException {
 
@@ -373,21 +380,6 @@ public class AddFacility extends AppCompatActivity implements
      * the corresponding button.
      */
 
-    @Override
-    public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-        if (checkedId == R.id.clButton)
-        {
-            String message = "Use current location";
-            Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
-            facilityAddedSnackbar.show();
-        }
-        else
-        {
-            String message = "Enter in an address";
-            Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
-            facilityAddedSnackbar.show();
-        }
-    }
 
     /**
      * When a new facility is added, a message is displayed, and the MainActivity class is loaded.
