@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -60,8 +61,8 @@ public class AddFacility extends AppCompatActivity implements
     private Facility newFacility = new Facility();
     private double latitude;
     private double longitude;
+    public static LatLng addFromMapLatLng;
     dbAddNewFacility db_AddNewFacility;
-    dbGetFacilitiesList db_GetFacilitiesList;
     private Location mLastLocation;
     private Boolean addressButtonChecked;
     private Boolean clButtonChecked;
@@ -81,6 +82,7 @@ public class AddFacility extends AppCompatActivity implements
     private RadioButton addressButton;      //find by address button
     private RadioGroup rBGroup;
     private Button createFacilityButton;    //button at bottom to create facility
+    private Button addFromMapButton;
 
     private static final String LOG_TAG = "ExampleApp";
 
@@ -113,6 +115,9 @@ public class AddFacility extends AppCompatActivity implements
         addressButton = (RadioButton) findViewById(R.id.useAddressBTN);
         createFacilityButton = (Button) findViewById(R.id.submitButton);
         createFacilityButton.setOnClickListener(this);
+
+        addFromMapButton = (Button) findViewById(R.id.addFromMap);
+        addFromMapButton.setOnClickListener(this);
         buildGoogleApiClient();
     }
 
@@ -214,6 +219,57 @@ public class AddFacility extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Finds the location information of a potential new facility using the latitude and longitude,
+     * then calls the addToDatabase method.
+     */
+
+    public void findLocationInfo() throws IOException {
+        Geocoder geocoder;
+        List<Address> addressInformation;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        addressInformation = geocoder.getFromLocation(this.latitude, this.longitude, 1);
+
+        String address1 = addressInformation.get(0).getAddressLine(0);
+        String address2 = "";
+        String city = addressInformation.get(0).getLocality();
+        String[] spState = addressInformation.get(0).getAddressLine(1).split(" ");
+        String state = spState[1];
+        String zip = addressInformation.get(0).getPostalCode();
+        String name = FacilityNameText2.getText().toString();
+        String notes = "";
+
+        addToDatabase(name, address1, address2, city, state, zip, notes);
+
+    }
+
+
+    /**
+     * Reads the information from the EditText fields into variables and then passes them to the addToDatabase method.
+     */
+
+    public void readUserInput() throws IOException {
+
+        String name = FacilityNameText.getText().toString();
+        String address1 = AddressText.getText().toString();
+        String address2 = "";
+        String city = CityText.getText().toString();
+        String state = StateText.getText().toString();
+        String zip = ZipText.getText().toString();
+        String notes = "";
+
+        addToDatabase(name, address1, address2, city, state, zip, notes);
+    }
+
+    public void addToDatabase(String name, String address1, String address2, String city, String state, String zip, String notes)
+    {
+        db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
+
+        db_AddNewFacility.execute(name, address1, address2, city, state, zip, Double.toString(latitude),
+                Double.toString(longitude), notes);
+    }
+
     // User clicked submit button - validate facility name from database.
     public void onClick (View v) {
 
@@ -226,6 +282,16 @@ public class AddFacility extends AppCompatActivity implements
         }
     }
 
+                    if (selectedId == R.id.clButton)
+                    {
+                        this.latitude = mLastLocation.getLatitude();
+                        this.longitude = mLastLocation.getLongitude();
+                        try {
+                            findLocationInfo();
+                        } catch (IOException IOE) {
+                            IOE.printStackTrace();
+                        }
+                    }
     // Return from dbFindFacility validate if new facility name is not already used
     @Override
     public void onDBFindFacility(Facility NewFacility) {
@@ -242,6 +308,14 @@ public class AddFacility extends AppCompatActivity implements
                 }
             }
 
+                    else if (selectedId == R.id.addressButton)
+                    {
+                        try {
+                            readUserInput();
+                        } catch (IOException IOE) {
+                            IOE.printStackTrace();
+                        }
+                    }
             else if (selectedId == R.id.useAddressBTN)  // create new facility from address input
             {
                 try {
@@ -262,6 +336,11 @@ public class AddFacility extends AppCompatActivity implements
         }
     }
 
+                break;
+
+            case R.id.addFromMap:
+                startActivity(new Intent(getApplicationContext(), AddFromMap.class));
+                break;
     //run this if user selects to add facility based on current location
     public void findLocationInformation() throws IOException {
 
@@ -289,6 +368,30 @@ public class AddFacility extends AppCompatActivity implements
         newFacility.setNotes("");
     }
 
+    /**
+     * Listener that determines which radio button was checked. A message is then displayed for
+     * the corresponding button.
+     */
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+        if (checkedId == R.id.clButton)
+        {
+            String message = "Use current location";
+            Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+            facilityAddedSnackbar.show();
+        }
+        else
+        {
+            String message = "Enter in an address";
+            Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
+            facilityAddedSnackbar.show();
+        }
+    }
+
+    /**
+     * When a new facility is added, a message is displayed, and the MainActivity class is loaded.
+     */
     private Address getGeocoder(LatLng latitudeLongitude) throws IOException{
         Address geoAddress = null ;  //new Address(Locale.getDefault())
  //       Geocoder geocoder;

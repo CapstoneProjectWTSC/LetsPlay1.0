@@ -4,6 +4,10 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.DialogInterface;
+import android.app.AlertDialog;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,9 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.widget.EditText;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -39,15 +41,21 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import static wtsc.letsplay10.R.id.map;
 
 
-public class MainActivity extends AppCompatActivity implements
+
+/**
+ * The AddFromMap class is a function of AddFacility. It allows the user to
+ * select a pin from the map and add that location as a facility that way.
+ */
+
+
+public class AddFromMap extends AppCompatActivity implements
         LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -56,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback,
         OnCameraIdleListener,
         PlaceSelectionListener,
-        OnScheduleDataLoaded{
+        OnNewFacilityAdded {
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -68,118 +76,93 @@ public class MainActivity extends AppCompatActivity implements
     private Toolbar toolbar;
     private LatLngBounds curBounds;
     private Marker lastMarkerClicked;
-    private List<MarkerOptions> showMarkerOpList;
     private final static LatLng WTSC_POS = new LatLng(35.651143, -78.704099);
     private int currentZoomLevel;
-    private boolean isHybrid;
     private boolean selectedPlaceMarkerShowing;
     private String markerFiltersType;
+    private String nameFromUser;
+    private dbAddNewFacility db_AddNewFacility;
     private User currentUser;
-    private Sport selectedSportType;
     private boolean isDialogReturn;
-    private String bDateText, eDateText;
-    private Date bDateTime, eDateTime;
-
-
-
+    private double latitude;
+    private double longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.add_from_map);
 
+        currentZoomLevel = 12;
+        selectedPlaceMarkerShowing = false;
 
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
+        buildGoogleApiClient();
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(1000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-            preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
-            // Load user preferences
+        toolbar = (Toolbar) findViewById(R.id.menu_bar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.lets_play_icon6);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        isDialogReturn = false;
 
-            // ---------------------------for testing -----------------------------------------------
-            //      SharedPreferences.Editor editor = preferences.edit();
-            //      editor.clear();
-            //       editor.commit();
+        markerFiltersType = "MY_SCHEDULES";
+        preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
+
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
+        autocompleteFragment.setOnPlaceSelectedListener(this);
+        autocompleteFragment.setHint("Find Location");
+
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
+        mapFragment.getMapAsync(this);
+
+        String message = "Search an address and/or click the marker to add a new facility";
+        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message,
+                Snackbar.LENGTH_LONG).setDuration(5000);
+        facilityAddedSnackbar.show();
+
+// ---------------------------for testing -----------------------------------------------
+  //      SharedPreferences.Editor editor = preferences.edit();
+  //      editor.clear();
+ //       editor.commit();
 //------------------------------------------------------------------------------------------
 
-
-            String json = preferences.getString("User", "");
-            //          json="";
-            // Check if user is signed in - if not start sign activity
-            if (json.equals("")) {
-                startActivityForResult(new Intent(getApplicationContext(), SignIn.class), 1);
-            }
-            // Get saved user class
-            currentUser = new User();
-            Gson gson = new Gson();
-            currentUser = gson.fromJson(json, User.class);
-            // Set map tpye preference
-            isHybrid = preferences.getBoolean("IS_HYBRID", false);
-
-
-            // Load class variables
-            currentZoomLevel = 10;
-            isHybrid = false;
-            selectedPlaceMarkerShowing = false;
-            buildGoogleApiClient();
-            mLocationRequest = new LocationRequest();
-            mLocationRequest.setInterval(1000);
-            mLocationRequest.setFastestInterval(1000);
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            isDialogReturn = false;
-            bDateTime = new Date();
-            eDateTime = new Date();
-            markerFiltersType = "MY_SCHEDULES";
-
-            // Set up toolbar
-            toolbar = (Toolbar) findViewById(R.id.menu_bar);
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setDisplayUseLogoEnabled(true);
-            getSupportActionBar().setLogo(R.drawable.lets_play_icon6);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-            // Declare & setup Google Places fragment
-            PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                    getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-            autocompleteFragment.setOnPlaceSelectedListener(this);
-            autocompleteFragment.setHint("Find Location");
-
-            // Declare main activity's map fragment
-            SupportMapFragment mapFragment =
-                    (SupportMapFragment) getSupportFragmentManager().findFragmentById(map);
-            mapFragment.getMapAsync(this);
-        }
-        catch (Exception ex){
-            String message = ex.getMessage().toString();
-            Snackbar invalidbDate = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
-            invalidbDate.show();
-        }
 
     }
 
 
         @Override
     public void onPlaceSelected(Place place) {
-        // TODO: Get info about the selected place.
-       // String s = (String)place.getName();
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-//        autocompleteFragment.
+
         selectedPlace = place;
-        LatLng selectedLatLng = selectedPlace.getLatLng();
+        final LatLng selectedLatLng = selectedPlace.getLatLng();
+            this.latitude = selectedLatLng.latitude;
+            this.longitude = selectedLatLng.longitude;
+
         Marker selectedMarker = mMap.addMarker(new MarkerOptions()
                                     .position(selectedLatLng)
                                     .title(selectedPlace.getName().toString()));
-        selectedMarker.showInfoWindow();
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, currentZoomLevel));
+        selectedMarker.showInfoWindow();;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, currentZoomLevel));
         selectedPlaceMarkerShowing = true;
+
+
+
+
     }
 
     @Override
     public void onError(Status status) {
         // TODO: Handle the error.
    }
-
-
 
     @Override
     public void onPause() {
@@ -188,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements
             SharedPreferences.Editor prefsEditor = preferences.edit();
             prefsEditor.putFloat("Location_LAT", (float) mLastLocation.getLatitude());
             prefsEditor.putFloat("Location_LNG", (float) mLastLocation.getLongitude());
-            prefsEditor.putBoolean("IS_HYBRID",isHybrid);
             prefsEditor.commit();
         }
     }
@@ -206,70 +188,7 @@ public class MainActivity extends AppCompatActivity implements
             local.setLongitude(savedInstanceState.getFloat("Location_LNG"));
             mLastLocation.set(local);
         }
-        isHybrid = preferences.getBoolean("IS_HYBRID",false);
      }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(lastMarkerClicked != null){lastMarkerClicked.hideInfoWindow();}
-        switch (item.getItemId()) {
-            case R.id.view_schedules:
-                // User chose the "Settings" item, show the app settings UI...
-                return true;
-//-------------------------------- view menu sub menu ---------------------------------
-            case R.id.my_schedules:
-                 markerFiltersType = "MY_SCHEDULES";
-                 onCameraIdle();
-                 return true;
-
-            case R.id.sports_type:
-                //TODO create select sports type activity
-                Intent sportsTypeIntent = new Intent(getApplicationContext(), SportsFilterActivity.class);
-                startActivityForResult(sportsTypeIntent,2);
-                return true;
-
-            case R.id.date_n_times:
-                Intent dateTimeFilterIntent = new Intent(getApplicationContext(), DateFilterActivity.class);
-                startActivityForResult(dateTimeFilterIntent,3);
-                return true;
-
-            case R.id.view_all:
-                markerFiltersType = "ALL_SCHEDULES";
-                onCameraIdle();
-                return  true;
-// --------------------end sub menu -----------------------------------------------------
-
-            case R.id.add_schedule :
-                Intent addSchIntent = new Intent(getApplicationContext(), AddScheduleActivity.class);
-                addSchIntent.putExtra("LAST_LOCATION",mLastLocation);
-                startActivity(addSchIntent);
-                return true;
-
-            case R.id.add_facility:
-                Intent addFacIntent = new Intent(getApplicationContext(), AddFacility.class);
-                addFacIntent.putExtra("LAST_LOCATION",mLastLocation);
-                startActivity(addFacIntent);
-                return true;
-
-            case R.id.isHybridCheckBox:
-                if(item.isChecked()){
-                    item.setChecked(false);
-                    isHybrid = false;
-                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-                }else {
-                    item.setChecked(true);
-                    isHybrid = true;
-                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID );
-                }
-                SharedPreferences.Editor prefsEditor = preferences.edit();
-                prefsEditor.putBoolean("IS_HYBRID", isHybrid);
-                prefsEditor.commit();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -280,54 +199,8 @@ public class MainActivity extends AppCompatActivity implements
                 Gson gson = new Gson();
                 currentUser = gson.fromJson(json, User.class);
                 break;
-            case 2:     // sports type
-                if(resultCode == RESULT_OK){
-                    selectedSportType = data.getParcelableExtra("SELECTED_SPORT");
-                    markerFiltersType = "SPORTS_TYPE";
-                    onCameraIdle();
-                }
-                break;
-            case 3:     // date & time
-                if(resultCode == RESULT_OK){
-                    markerFiltersType = "DATE_TIME";
-                    SimpleDateFormat df = new SimpleDateFormat("MM/dd/yy");
-                    bDateText = data.getExtras().getString("BEGINNING_DATE_TIME");
-                    eDateText = data.getExtras().getString("ENDING_DATE_TIME");
-
-                    try {
-                        Date parsed = df.parse(bDateText);
-                        bDateTime = new Date(parsed.getTime() );
-                    } catch (ParseException e) {
-                        String message = "Invalided Start Date or Time";
-                        Snackbar invalidbDate = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
-                        invalidbDate.show();
-                        markerFiltersType = "MY_SCHEDULES";
-                    }
-
-                    try {
-                        Date parsed = df.parse(eDateText);
-                        eDateTime = new Date(parsed.getTime() );
-                    } catch (ParseException e) {
-                        String message = "Invalided Ending Date or Time";
-                        Snackbar invalideDate = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
-                        invalideDate.show();
-                        markerFiltersType = "MY_SCHEDULES";
-                    }
-                    onCameraIdle();
-                }
-                break;
-
             default:
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.toolbar_menu , menu);
-        MenuItem item = menu.findItem(R.id.isHybridCheckBox);
-        item.setChecked(isHybrid);
-        return true;
     }
 
     @Override
@@ -335,14 +208,9 @@ public class MainActivity extends AppCompatActivity implements
         mMap = map;
         mMap.setOnCameraIdleListener(this);
         mMap.setOnMarkerClickListener(this);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        if(isHybrid){
-            mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        }else {
-            mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        }
+        map.getUiSettings().setZoomControlsEnabled(true);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkLocationPermission()) {
                 mMap.setMyLocationEnabled(true);
             }
@@ -351,10 +219,77 @@ public class MainActivity extends AppCompatActivity implements
         map.addMarker(new MarkerOptions().position(WTSC_POS).title("Wake Tech Software Corp"));
     }
 
+    /**
+     * This method handles the onClick event when a user clicks a marker. The marker is parsed for
+     * the location, and then a method is called to handle the dialogs.
+     */
     @Override
     public boolean onMarkerClick(final Marker marker) {
         lastMarkerClicked = marker;
+
+        final LatLng markerLatLng = lastMarkerClicked.getPosition();
+        this.latitude = markerLatLng.latitude;
+        this.longitude = markerLatLng.longitude;
+
+        displayDialogs();
+
         return false;
+    }
+
+    //==================================================================================================================
+    /**
+     * This method builds and displays the dialog boxes for the user's marker click. If the user
+     * clicks yes to the confirmation dialog, a second dialog asking for the name of the facility
+     * is displayed.
+     */
+    public void displayDialogs()
+    {
+        //Creates the second dialog box that requests the name of the location
+        //-----------------------------------------------------------------------------------
+        final AlertDialog.Builder getLocationNameBuilder = new AlertDialog.Builder(this);
+        getLocationNameBuilder.setTitle("Please enter in a name for this facility:");
+
+        final EditText input = new EditText(this);
+
+        getLocationNameBuilder.setView(input);
+
+        getLocationNameBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                nameFromUser = input.getText().toString();
+                try {
+                    findLocationInfo();
+                } catch (IOException IOE)
+                {
+                    IOE.printStackTrace();
+                }
+            }
+        });
+
+
+        //Creates the first dialog box that confirms that the user wants to add this location
+        //-----------------------------------------------------------------------------------
+        AlertDialog.Builder confirmAddBuilder = new AlertDialog.Builder(this);
+
+        confirmAddBuilder.setMessage("Would you like to add this facility?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        getLocationNameBuilder.show();
+                        dialog.dismiss();
+
+
+
+                    }
+                });
+        confirmAddBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog confirmAddAlert = confirmAddBuilder.create();
+        confirmAddAlert.show();
     }
 //==================================================================================================================
     @Override
@@ -365,43 +300,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
         curBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        if(!selectedPlaceMarkerShowing) {
-            switch (markerFiltersType){
-                case "MY_SCHEDULES":
-                    dbGetMySchedulesMarkers mySchedules = new dbGetMySchedulesMarkers(MainActivity.this, this);
-                    mySchedules.execute(new UserBounds(currentUser,curBounds));
-                    break;
-                case "ALL_SCHEDULES":
-                    dbGetAllSchedulesMarkers allSchedules = new dbGetAllSchedulesMarkers(MainActivity.this, this );
-                    allSchedules.execute(new UserBounds(currentUser,curBounds));
-                    break;
-                case "DATE_TIME":
-                    isDialogReturn = true;
-                    dbGetDateScheduleMarkers dateSchedules = new dbGetDateScheduleMarkers(MainActivity.this, this);
-                    dateSchedules.execute(new DateTimeBounds(bDateTime,eDateTime,curBounds));
-                    break;
-                case "SPORTS_TYPE":
-                    isDialogReturn = true;
-                    dbGetSportTypeScheduleMarkers sportsTypeSchedules = new dbGetSportTypeScheduleMarkers(MainActivity.this, this);
-                    sportsTypeSchedules.execute(new SportsBounds(selectedSportType,curBounds));
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    @Override
-    public void onScheduleDataLoaded(List<MarkerOptions> scheduleMarkers) {
-        showMarkerOpList = scheduleMarkers;
-        mMap.clear();
-        if(scheduleMarkers != null && scheduleMarkers.size() > 0){
-            for(MarkerOptions sM : scheduleMarkers ){
-                Marker marker = mMap.addMarker(sM);
-            }
-        }
-        mMap.addMarker(new MarkerOptions().position(WTSC_POS).title("Wake Tech Software Corp"));
-        setCurrentLocation(mLastLocation);
     }
 
 //==================================================================================================================
@@ -538,5 +436,53 @@ public class MainActivity extends AppCompatActivity implements
             // other 'case' lines to check for other permissions this app might request.
             //You can add here other case statements according to your requirement.
         }
+    }
+
+    /**
+     * This method uses the latitude and longitude of the marker to retrieve the location's information
+     */
+    public void findLocationInfo() throws IOException {
+        Geocoder geocoder;
+        List<Address> addressInformation;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        addressInformation = geocoder.getFromLocation(this.latitude, this.longitude, 1);
+
+        String address1 = addressInformation.get(0).getAddressLine(0);
+        String address2 = "";
+        String city = addressInformation.get(0).getLocality();
+        String[] spState = addressInformation.get(0).getAddressLine(1).split(" ");
+        String state = spState[1];
+        String zip = addressInformation.get(0).getPostalCode();
+        String name = nameFromUser;
+        String notes = "";
+
+        addToDatabase(name, address1, address2, city, state, zip, notes);
+    }
+
+    /**
+     * Method to add the new location to the database
+     */
+    public void addToDatabase(String name, String address1, String address2, String city, String state, String zip, String notes)
+    {
+        db_AddNewFacility = new dbAddNewFacility(AddFromMap.this);
+
+        db_AddNewFacility.execute(name, address1, address2, city, state, zip, Double.toString(latitude),
+                Double.toString(longitude), notes);
+    }
+
+    /**
+     * When a new facility is added, a message is displayed, and the MainActivity class is loaded.
+     */
+    @Override
+    public void onDBNewFacilityAdded(Facility NewFacility) {
+        String name = NewFacility.getName();
+        String message = "The facility " + name + " successfully added!";
+
+        // TODO: 4/23/2017 This SnackBar does not show up; it needs to be displayed either from the MainActivity class, or the program needs to wait to display it before initiating the MainActivityClass.
+        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message,
+                Snackbar.LENGTH_LONG);
+
+        startActivity(new Intent(getApplicationContext(),MainActivity.class));
     }
 }

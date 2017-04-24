@@ -1,10 +1,5 @@
 package wtsc.letsplay10;
 
-/**
- * May not be finished until I explicitly say so. I will commit this file so I can use it from work and from home.
- * Created by samal on 3/9/2017.
- */
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,6 +21,9 @@ import static wtsc.letsplay10.R.id.createAccountBTN;
 import static wtsc.letsplay10.R.id.signInBTN;
 
 
+/**
+ * Class to allow the user to sign into his/her account.
+ */
 public class SignIn extends AppCompatActivity implements
         OnClickListener,
         OnKeyListener,
