@@ -41,16 +41,16 @@
         android:id="@+id/RGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:checkedButton="@+id/clButton">
+        android:checkedButton="@+id/useCurrentLocationBTN">
 
         <RadioButton
-            android:id="@+id/clButton"
+            android:id="@+id/useCurrentLocationBTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Use Current Location" />
 
         <RadioButton
-            android:id="@+id/addressButton"
+            android:id="@+id/useAddressBTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add By Address" />
@@ -58,7 +58,7 @@
 
     <TableRow android:paddingTop="5dp">
 
- <!--       <EditText
+        <EditText
             android:id="@+id/FacilityNameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -66,22 +66,6 @@
             android:hint="Facility Name"
             android:inputType="textPersonName"
             android:paddingTop="10dp" />
-        <fragment
-            android:id="@+id/add_facility_place_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            />  -->
-
-        <AutoCompleteTextView
-            android:id="@+id/autoCompleteTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Please enter your place" >
-
-            <requestFocus />
-        </AutoCompleteTextView>
 
     </TableRow>
 

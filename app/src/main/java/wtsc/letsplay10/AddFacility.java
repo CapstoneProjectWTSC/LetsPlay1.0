@@ -1,33 +1,33 @@
 package wtsc.letsplay10;
 
-import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,9 +53,11 @@ public class AddFacility extends AppCompatActivity implements
         LocationListener,
         OnNewFacilityAdded,
         OnCheckedChangeListener,
-        OnItemClickListener{
+        OnItemClickListener,
+        OnFindFacility,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private Facility newFacility;
+    private Facility newFacility = new Facility();
     private double latitude;
     private double longitude;
     dbAddNewFacility db_AddNewFacility;
@@ -63,6 +65,10 @@ public class AddFacility extends AppCompatActivity implements
     private Location mLastLocation;
     private Boolean addressButtonChecked;
     private Boolean clButtonChecked;
+    private dbFindFacility db_findFacility;
+    private Address currentAddress;
+    private Geocoder geocoder;
+    private GoogleApiClient mGoogleApiClient;
 
   //  private EditText FacilityNameText2;     //top one for current location
     private EditText FacilityNameText;      //bottom one for find by address
@@ -90,20 +96,12 @@ public class AddFacility extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_facility);
 
-        //preferences = getSharedPreferences("userSettings", MODE_PRIVATE);
-        //String json = preferences.getString("User", "");
         Intent intent = getIntent();
         mLastLocation = intent.getParcelableExtra("LAST_LOCATION");
         TextView tv = (TextView)findViewById(R.id.currentLocationTxt);
         tv.setText("Lat: "+String.valueOf(mLastLocation.getLatitude())+"  Lng: "+ String.valueOf(mLastLocation.getLongitude()));
 
-        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
-
-        autoCompView.setAdapter(new GooglePlacesAutocompleteAdapter(this, R.layout.list_item));
-        autoCompView.setOnItemClickListener(this);
-
-  //      FacilityNameText2 = (EditText) findViewById(R.id.FacilityNameText2);
-   //     FacilityNameText = (EditText) findViewById(R.id.FacilityNameText);
+        FacilityNameText = (EditText) findViewById(R.id.FacilityNameText);
         AddressText = (EditText) findViewById(R.id.AddressText);
         CityText = (EditText) findViewById(R.id.CityText);
         StateText = (EditText) findViewById(R.id.StateText);
@@ -111,17 +109,22 @@ public class AddFacility extends AppCompatActivity implements
 
         rBGroup = (RadioGroup) findViewById(R.id.RGroup);
         rBGroup.setOnCheckedChangeListener(this);
-
-        clButton = (RadioButton) findViewById(R.id.clButton);
-
-        addressButton = (RadioButton) findViewById(R.id.addressButton);
-
+        clButton = (RadioButton) findViewById(R.id.useCurrentLocationBTN);
+        addressButton = (RadioButton) findViewById(R.id.useAddressBTN);
         createFacilityButton = (Button) findViewById(R.id.submitButton);
         createFacilityButton.setOnClickListener(this);
+        buildGoogleApiClient();
     }
 
-
-
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .enableAutoManage(this, 0, this)
+                .build();
+        mGoogleApiClient.connect();
+    }
 
 
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -184,58 +187,12 @@ public class AddFacility extends AppCompatActivity implements
         return resultList;
     }
 
-    class GooglePlacesAutocompleteAdapter extends ArrayAdapter<String> implements Filterable {
-        private ArrayList<String> resultList;
 
-        public GooglePlacesAutocompleteAdapter(Context context, int textViewResourceId) {
-            super(context, textViewResourceId);
-        }
 
-        @Override
-        public int getCount() {
-            return resultList.size();
-        }
-
-        @Override
-        public String getItem(int index) {
-            return resultList.get(index);
-        }
-
-        @Override
-        public Filter getFilter() {
-            Filter filter = new Filter() {
-                @Override
-                protected FilterResults performFiltering(CharSequence constraint) {
-                    FilterResults filterResults = new FilterResults();
-                    if (constraint != null) {
-                        // Retrieve the autocomplete results.
-                        resultList = autocomplete(constraint.toString());
-
-                        // Assign the data to the FilterResults
-                        filterResults.values = resultList;
-                        filterResults.count = resultList.size();
-                    }
-                    return filterResults;
-                }
-
-                @Override
-                protected void publishResults(CharSequence constraint, FilterResults results) {
-                    if (results != null && results.count > 0) {
-                        notifyDataSetChanged();
-                    } else {
-                        notifyDataSetInvalidated();
-                    }
-                }
-            };
-            return filter;
-        }
+    private void displaySnackBarMessage (String message, int duration ){
+        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, duration);
+        facilityAddedSnackbar.show();
     }
-
-
-
-
-
-
 
 
     @Override
@@ -245,30 +202,104 @@ public class AddFacility extends AppCompatActivity implements
 
     }
 
-    //run this if user selects to add facility based on current location
+    @Override
+    public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+        if (checkedId == R.id.useCurrentLocationBTN)
+        {
+            displaySnackBarMessage("Use current location",Snackbar.LENGTH_LONG);
+        }
+        else
+        {
+            displaySnackBarMessage("Enter in an address",Snackbar.LENGTH_LONG);
+        }
+    }
 
+    // User clicked submit button - validate facility name from database.
+    public void onClick (View v) {
+
+        switch (v.getId())
+        {
+            case R.id.submitButton:
+                db_findFacility = new dbFindFacility(AddFacility.this);
+                db_findFacility.execute(FacilityNameText.getText().toString());
+                break;
+        }
+    }
+
+    // Return from dbFindFacility validate if new facility name is not already used
+    @Override
+    public void onDBFindFacility(Facility NewFacility) {
+        if(NewFacility == null){        // facility name is not already used
+            int selectedId = rBGroup.getCheckedRadioButtonId();
+            newFacility.setLatitude(mLastLocation.getLatitude());
+            newFacility.setLongitude(mLastLocation.getLongitude());
+            if (selectedId == R.id.useCurrentLocationBTN)   // create new facility from current location
+            {
+                try {
+                    findLocationInformation();
+                } catch (IOException IOE) {
+                    IOE.printStackTrace();
+                }
+            }
+
+            else if (selectedId == R.id.useAddressBTN)  // create new facility from address input
+            {
+                try {
+                    addLocationInformation();
+                } catch (IOException IOE) {
+                    IOE.printStackTrace();
+                }
+            }
+            // add new facility to database
+            db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
+            db_AddNewFacility.execute(newFacility.getName(), newFacility.getAddress1(), newFacility.getAddress2(),
+                    newFacility.getCity(), newFacility.getState(), newFacility.getZip(),
+                    Double.toString(newFacility.getLatitude()), Double.toString(newFacility.getLongitude()),
+                    newFacility.getNotes());
+        } else
+        {       // facility name is already used show message
+            displaySnackBarMessage("Name Allready In Database",Snackbar.LENGTH_LONG);
+        }
+    }
+
+    //run this if user selects to add facility based on current location
     public void findLocationInformation() throws IOException {
+
+        Address geoAddress = getGeocoder(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         Geocoder geocoder;
         List<Address> addressInformation;
         geocoder = new Geocoder(this, Locale.getDefault());
 
-        addressInformation = geocoder.getFromLocation(this.latitude, this.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        addressInformation = geocoder.getFromLocation(newFacility.getLatitude(), newFacility.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        if(addressInformation.size() > 0) {
+            newFacility.setAddress1(addressInformation.get(0).getAddressLine(0)); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            newFacility.setAddress2("");
+            newFacility.setCity(addressInformation.get(0).getLocality());
+            String[] spState = addressInformation.get(0).getAddressLine(1).split(" ");
+            newFacility.setState(spState[1]);
+            newFacility.setZip(addressInformation.get(0).getPostalCode());
+   //         if (addressInformation.get(0).getFeatureName() != "") {
+     //           newFacility.setName(addressInformation.get(0).getFeatureName());
+                //        newFacility.setAddress1(addressInformation.get(0).getAddressLine(0));
+       //     } else {
+         //       newFacility.setName(FacilityNameText.getText().toString());
+       //     }
+            newFacility.setName(FacilityNameText.getText().toString());
+        }
+        newFacility.setNotes("");
+    }
 
-        String address1 = addressInformation.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-        String address2 = "";
-        String city = addressInformation.get(0).getLocality();
-        String[] spState = addressInformation.get(0).getAddressLine(1).split(" ");
-        String state = spState[1];
-        String zip = addressInformation.get(0).getPostalCode();
-        String name = FacilityNameText.getText().toString();
- //       String name = FacilityNameText2.getText().toString();
-        String notes = "";
-
-        db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
-
-        db_AddNewFacility.execute(name, address1, address2,city, state, zip, Double.toString(latitude),
-                Double.toString(longitude), notes);
-
+    private Address getGeocoder(LatLng latitudeLongitude) throws IOException{
+        Address geoAddress = null ;  //new Address(Locale.getDefault())
+ //       Geocoder geocoder;
+        List<Address> addressInformation;
+        geocoder = new Geocoder(this, Locale.getDefault());
+        // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        addressInformation = geocoder.getFromLocation(latitudeLongitude.latitude, latitudeLongitude.longitude, 1);
+        if(addressInformation.size() > 0) {
+            geoAddress = addressInformation.get(0);
+        }
+        return geoAddress;
     }
 
 
@@ -276,86 +307,48 @@ public class AddFacility extends AppCompatActivity implements
 
     public void addLocationInformation() throws IOException {
 
-        String address1 = AddressText.getText().toString();
-        String address2 = "";
-        String city = CityText.getText().toString();
-        String state = StateText.getText().toString();
-        String zip = ZipText.getText().toString();
-        String name = FacilityNameText.getText().toString();
-        String notes = "";
-
-        db_AddNewFacility = new dbAddNewFacility(AddFacility.this);
-
-        db_AddNewFacility.execute(name, address1, address2,city, state, zip, Double.toString(latitude),
-                 Double.toString(longitude), notes);
-
-
+        newFacility.setAddress1(AddressText.getText().toString());
+        newFacility.setAddress2("");
+        newFacility.setCity(CityText.getText().toString());
+        newFacility.setState(StateText.getText().toString());
+        newFacility.setZip(ZipText.getText().toString());
+        newFacility.setName(FacilityNameText.getText().toString());
+        newFacility.setNotes("");
     }
 
-
-    public void onKey(View view, int keyCode, KeyEvent event){}
-
-    /*              //could possibly add something like this to disable button until user enters something into field.
-                    if(FacilityNameText2.length() > 0) //if user has entered something in the fields, the function will work
-                {
-     */
-
-    public void onClick (View v) {
-        int selectedId = rBGroup.getCheckedRadioButtonId();
-
-        switch (v.getId())
-        {
-            case R.id.submitButton:
-
-                    if (selectedId == R.id.clButton)
-                    {
-                        this.latitude = mLastLocation.getLatitude();
-                        this.longitude = mLastLocation.getLongitude();
-                        try {
-                            findLocationInformation();
-                        } catch (IOException IOE) {
-                            IOE.printStackTrace();
-                        }
-                    }
-
-                    else if (selectedId == R.id.addressButton)
-                    {
-                        try {
-                            addLocationInformation();
-                        } catch (IOException IOE) {
-                            IOE.printStackTrace();
-                        }
-                    }
-
-
-                break;
-            //case R.id.fromMap:
-              //  break;
-        }
-    }
-
-    @Override
-    public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-        if (checkedId == R.id.clButton)
-        {
-            String message = "Use current location";
-            Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
-            facilityAddedSnackbar.show();
-        }
-        else
-        {
-            String message = "Enter in an address";
-            Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
-            facilityAddedSnackbar.show();
-        }
-    }
-
+    // return from adding new facility to database
     @Override
     public void onDBNewFacilityAdded(Facility NewFacility) {
         String name = NewFacility.getName();
         String message = "The facility " + name + " successfully added!";
-        Snackbar facilityAddedSnackbar = Snackbar.make(findViewById(R.id.snackbarCoordinatorLayout), message, Snackbar.LENGTH_LONG);
-        facilityAddedSnackbar.show();
-        startActivity(new Intent(getApplicationContext(),MainActivity.class));
+        displaySnackBarMessage(message,Snackbar.LENGTH_LONG); // display confirmation
+        // start main activity
+ //       startActivity(new Intent(getApplicationContext(),MainActivity.class));
+        finish();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        try{
+            currentAddress = getGeocoder(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            if(currentAddress!=null) {
+                if (currentAddress.getAddressLine(0).indexOf(currentAddress.getFeatureName()) > 0) {
+                    FacilityNameText.setText(currentAddress.getFeatureName());
+                }
+            }
+        }
+        catch (IOException IOE) {
+            IOE.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }

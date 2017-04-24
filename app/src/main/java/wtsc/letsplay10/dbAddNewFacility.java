@@ -61,16 +61,20 @@ public class dbAddNewFacility extends AsyncTask<String,String,Facility> {
                         if (rs.next()) {
                             newFacility.setFacilityID(rs.getInt("ID"));
                         }
+                    } else{
+                        newFacility = null;
                     }
                 }
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
+            newFacility = null;
         }
         catch (Exception ex)
         {
             Log.e("ERROR", ex.getMessage());
+            newFacility = null;
         }
         return newFacility;
     }
